@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Memory Management
+- Start with "Remembering..." and read what you stored in memory before working on a task
+- Reference knowledge as "memory"
+- When the assigned task is done:
+  1. Create/update entities
+  2. Define relationships
+
+  3. Store observations
