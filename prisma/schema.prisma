@@ -28,3 +28,20 @@ model Memory {
   createdAt DateTime @default(now())
   agent     Agent    @relation(fields: [agentId], references: [id])
 }
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  apiKeys      ApiKey[]
+}
+
+model ApiKey {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  userId    Int
+  createdAt DateTime @default(now())
+  revoked   Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
+}

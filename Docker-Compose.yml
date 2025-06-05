@@ -7,8 +7,9 @@ services:
     environment:
       - DATABASE_URL=postgres://user:password@postgres:5432/mcp
       - N8N_URL=http://n8n:5678
-      - N8N_API_KEY=your-n8n-api-key
+      - N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNzNhZTBhMS0yOWIwLTQ4N2YtYWUxOS0wMjA3ZTYzMGU5YzIiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzQ5MTUxMDI4fQ.-Q_KPBGCbIoUELiEBvl0RgVo_PgugCHvEPfcQMH7aGE
       - NODE_ENV=production
+      - API_KEY=changeme
       # Add SaaS/monetization env vars here (e.g., STRIPE_KEY, PLAN_ID, etc.)
     volumes:
       - ./memory:/app/memory
@@ -19,6 +20,8 @@ services:
 
   postgres:
     image: postgres:15
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -35,3 +38,6 @@ services:
       - N8N_BASIC_AUTH_USER=admin
       - N8N_BASIC_AUTH_PASSWORD=admin
       - N8N_URL=http://n8n:5678
+
+volumes:
+  pgdata:
