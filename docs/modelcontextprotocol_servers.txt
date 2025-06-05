@@ -1,0 +1,2448 @@
+TITLE: Calling generate_image Tool (JavaScript)
+DESCRIPTION: This JavaScript snippet demonstrates how to invoke the `generate_image` tool using an MCP client object. It shows calling the `callTool` method with the tool name and an arguments object containing the prompt, specified model, and number of images.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everart/README.md#_snippet_6
+
+LANGUAGE: javascript
+CODE:
+```
+const result = await client.callTool({
+  name: "generate_image",
+  arguments: {
+    prompt: "A cat sitting elegantly",
+    model: "7000",
+    image_count: 1
+  }
+});
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP Filesystem Server with Docker for Claude Desktop
+DESCRIPTION: Example JSON configuration for `claude_desktop_config.json` to run the filesystem MCP server using Docker, mounting specified local directories (including one read-only) and a file to the server's `/projects` path.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md#_snippet_0
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--mount", "type=bind,src=/Users/username/Desktop,dst=/projects/Desktop",
+        "--mount", "type=bind,src=/path/to/other/allowed/dir,dst=/projects/other/allowed/dir,ro",
+        "--mount", "type=bind,src=/path/to/file.txt,dst=/projects/path/to/file.txt",
+        "mcp/filesystem",
+        "/projects"
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code Settings for EverArt Server using Docker
+DESCRIPTION: This JSON snippet configures the EverArt MCP server manually in VS Code settings or a `.vscode/mcp.json` file. It includes an input definition to prompt the user for the API key and a server definition that uses 'docker' to run the server image, passing the input key as an environment variable.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everart/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "everart_api_key",
+        "description": "EverArt API Key",
+        "password": true
+      }
+    ],
+    "servers": {
+      "everart": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "-e", "EVERART_API_KEY", "mcp/everart"],
+        "env": {
+          "EVERART_API_KEY": "${input:everart_api_key}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Manual VS Code Configuration for Brave Search MCP Server (Docker)
+DESCRIPTION: This JSON snippet provides the configuration block for setting up the Brave Search MCP server within VS Code using Docker. It defines an input prompt for the API key and configures the 'brave-search' server to run a Docker container, injecting the prompted API key as an environment variable. This can be added to VS Code User Settings (JSON) or a `.vscode/mcp.json` file.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/brave-search/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "brave_api_key",
+        "description": "Brave Search API Key",
+        "password": true
+      }
+    ],
+    "servers": {
+      "brave-search": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "-e",
+          "BRAVE_API_KEY",
+          "mcp/brave-search"
+        ],
+        "env": {
+          "BRAVE_API_KEY": "${input:brave_api_key}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Slack MCP Server in VS Code Settings (Docker)
+DESCRIPTION: JSON configuration block for integrating the Slack MCP server into VS Code user or workspace settings when running via Docker. It defines input prompts for the user to provide token and ID, then configures the Docker server command and environment variables using these inputs.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/slack/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "slack_bot_token",
+        "description": "Slack Bot Token (starts with xoxb-)",
+        "password": true
+      },
+      {
+        "type": "promptString",
+        "id": "slack_team_id",
+        "description": "Slack Team ID (starts with T)"
+      }
+    ],
+    "servers": {
+      "slack": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/slack"],
+        "env": {
+          "SLACK_BOT_TOKEN": "${input:slack_bot_token}",
+          "SLACK_TEAM_ID": "${input:slack_team_id}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring PostgreSQL MCP Server for VS Code (Docker)
+DESCRIPTION: This JSON block configures the Model Context Protocol server for PostgreSQL within VS Code settings or a workspace configuration file, specifying it should be launched via Docker. It defines an input prompt for the PostgreSQL URL and configures the "postgres" server to use the Docker command, passing the collected URL as an argument to the `mcp/postgres` image. This enables VS Code extensions to interact with a PostgreSQL database via the MCP server running in a container, prompting for the connection details dynamically.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/postgres/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "pg_url",
+        "description": "PostgreSQL URL (e.g. postgresql://user:pass@host.docker.internal:5432/mydb)"
+      }
+    ],
+    "servers": {
+      "postgres": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "mcp/postgres",
+          "${input:pg_url}"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Installing mcp-server-git using Pip
+DESCRIPTION: Installs the mcp-server-git package using the pip package manager. This is an alternative installation method if uv is not preferred or available.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/git/README.md#_snippet_0
+
+LANGUAGE: Bash
+CODE:
+```
+pip install mcp-server-git
+```
+
+----------------------------------------
+
+TITLE: Defining Knowledge Graph Relation Format - JSON
+DESCRIPTION: Shows the structure for representing a directed relationship between two entities. It includes `from` and `to` fields for the source and target entity names, and `relationType` for the relationship description, typically in active voice.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "from": "John_Smith",
+  "to": "Anthropic",
+  "relationType": "works_at"
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Google Maps MCP Server in VS Code (Manual NPX)
+DESCRIPTION: This JSON configuration block is added to VS Code user settings or `.vscode/mcp.json` to configure the Google Maps MCP server via NPX. It defines an input prompt for the API key and sets the server command using NPX, referencing the dynamically provided API key.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/google-maps/README.md#_snippet_2
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "maps_api_key",
+        "description": "Google Maps API Key",
+        "password": true
+      }
+    ],
+    "servers": {
+      "google-maps": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-google-maps"],
+        "env": {
+          "GOOGLE_MAPS_API_KEY": "${input:maps_api_key}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Cloning Forked Repository - Git Bash
+DESCRIPTION: Instructions on how to clone your forked copy of the MCP servers repository to your local machine using the Git command line.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/CONTRIBUTING.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/your-username/servers.git
+```
+
+----------------------------------------
+
+TITLE: Install MCP Everything Server Package
+DESCRIPTION: Installs the '@modelcontextprotocol/server-everything' package globally using npm, making the 'npx' command available.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everything/README.md#_snippet_6
+
+LANGUAGE: shell
+CODE:
+```
+npm install -g @modelcontextprotocol/server-everything@latest
+```
+
+----------------------------------------
+
+TITLE: Defining Knowledge Graph Observations Format - JSON
+DESCRIPTION: Provides an example of how observations are structured when linked to an entity. It contains the `entityName` to identify the target entity and an array of `observations` (strings) representing discrete facts about that entity.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "entityName": "John_Smith",
+  "observations": [
+    "Speaks fluent Spanish",
+    "Graduated in 2019",
+    "Prefers morning meetings"
+  ]
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop with AWS KB Retrieval Server (Docker)
+DESCRIPTION: Provides the JSON configuration required to register the AWS Knowledge Base retrieval server with Claude Desktop using Docker. It specifies the `docker` command, arguments to run the container interactively and remove it after use, and passes AWS credentials as environment variables from the host environment.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/aws-kb-retrieval-server/README.md#_snippet_0
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "aws-kb-retrieval": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "AWS_ACCESS_KEY_ID",
+        "-e",
+        "AWS_SECRET_ACCESS_KEY",
+        "-e",
+        "AWS_REGION",
+        "mcp/aws-kb-retrieval-server"
+      ],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "YOUR_ACCESS_KEY_HERE",
+        "AWS_SECRET_ACCESS_KEY": "YOUR_SECRET_ACCESS_KEY_HERE",
+        "AWS_REGION": "YOUR_AWS_REGION_HERE"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Install Fetch Server with PIP
+DESCRIPTION: Use this command to install the mcp-server-fetch Python package using the pip package manager. This makes the server available as a Python module.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/fetch/README.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+pip install mcp-server-fetch
+```
+
+----------------------------------------
+
+TITLE: Configure VS Code User Settings (.vscode/mcp.json) with Docker
+DESCRIPTION: JSON configuration snippet for integrating the fetch MCP server into VS Code workspace settings using the .vscode/mcp.json file and running the server via Docker. Requires the 'mcp' key.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/fetch/README.md#_snippet_6
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "fetch": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/fetch"]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Multiple Servers in Claude Desktop (JSON)
+DESCRIPTION: This JSON configuration snippet demonstrates how to configure multiple different MCP servers (filesystem, git, github, postgres) within the Claude Desktop client, showing various command, arguments, and environment variable settings.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/README.md#_snippet_5
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/files"]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "path/to/git/repo"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Install Git Server using pip (Python)
+DESCRIPTION: This command uses `pip` to install the `mcp-server-git` package from PyPI, which is a prerequisite for running the Python-based Git server using the `python -m` command.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/README.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+pip install mcp-server-git
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP Filesystem Server with NPX for VS Code
+DESCRIPTION: Example JSON configuration for VS Code settings (`settings.json` or `.vscode/mcp.json`) to run the filesystem MCP server using NPX, specifying the current workspace folder (`${workspaceFolder}`) as an allowed directory argument.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md#_snippet_3
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "filesystem": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-filesystem",
+          "${workspaceFolder}"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Slack MCP Server in Claude Desktop (Docker)
+DESCRIPTION: JSON configuration snippet to be added to the `claude_desktop_config.json` file to integrate the Slack MCP server when running it via Docker. It specifies the Docker command and arguments, mapping environment variables from the host, and providing placeholder values.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/slack/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "slack": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "SLACK_BOT_TOKEN",
+        "-e",
+        "SLACK_TEAM_ID",
+        "-e",
+        "SLACK_CHANNEL_IDS",
+        "mcp/slack"
+      ],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-your-bot-token",
+        "SLACK_TEAM_ID": "T01234567",
+        "SLACK_CHANNEL_IDS": "C01234567, C76543210"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Pushing Changes to Fork - Git Bash
+DESCRIPTION: Command to push the committed changes from your local branch to your corresponding branch on your fork on GitHub.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/CONTRIBUTING.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+git push origin my-feature
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP Puppeteer Server with Docker in VS Code (JSON)
+DESCRIPTION: This JSON block configures the MCP Puppeteer server to run using Docker within VS Code settings. It specifies the Docker command and arguments to run the `mcp/puppeteer` image with necessary options like interactive mode, auto-removal, and environment variables.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/puppeteer/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "puppeteer": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "--init",
+          "-e",
+          "DOCKER_CONTAINER=true",
+          "mcp/puppeteer"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Creating New Branch - Git Bash
+DESCRIPTION: How to create a new local branch for your feature or bug fix and immediately switch to it, isolating your work from the main branch.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/CONTRIBUTING.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+git checkout -b my-feature
+```
+
+----------------------------------------
+
+TITLE: Committing Changes - Git Bash
+DESCRIPTION: How to commit the staged changes to your local branch with a descriptive message summarizing the modifications.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/CONTRIBUTING.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+git commit -m "Description of changes"
+```
+
+----------------------------------------
+
+TITLE: Configure Redis MCP Server in VS Code Settings (NPX) (JSON)
+DESCRIPTION: JSON configuration snippet for integrating the Redis MCP server into VS Code User Settings (`settings.json`) or workspace settings (`.vscode/mcp.json`) using NPX. It defines a prompt to get the Redis URL from the user and configures the server execution via the `npx` command and arguments.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/redis/README.md#_snippet_2
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "redis_url",
+        "description": "Redis URL (e.g. redis://localhost:6379)"
+      }
+    ],
+    "servers": {
+      "redis": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-redis"],
+        "env": {
+          "REDIS_URL": "${input:redis_url}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring PostgreSQL MCP Server for Claude Desktop (Docker)
+DESCRIPTION: This JSON block configures the Model Context Protocol server for PostgreSQL within the Claude Desktop application, specifying it should be launched via Docker. It defines the server name "postgres" and provides the Docker command and arguments, including the image name and the PostgreSQL connection string (using `host.docker.internal` for macOS hosts). This setup allows Claude Desktop to interact with a PostgreSQL database via the MCP server running in a container.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/postgres/README.md#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "docker",
+      "args": [
+        "run", 
+        "-i", 
+        "--rm", 
+        "mcp/postgres", 
+        "postgresql://host.docker.internal:5432/mydb"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Redis MCP Server in Claude Desktop (Docker) (JSON)
+DESCRIPTION: JSON configuration snippet to add the Redis MCP server to the Claude Desktop application's `claude_desktop_config.json` file using Docker. It specifies the Docker command, arguments (run, interactive, remove on exit, image name, Redis URL), and notes on using `host.docker.internal` on macOS.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/redis/README.md#_snippet_0
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "redis": {
+      "command": "docker",
+      "args": [
+        "run", 
+        "-i", 
+        "--rm", 
+        "mcp/redis", 
+        "redis://host.docker.internal:6379"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Adding Upstream Remote - Git Bash
+DESCRIPTION: Command to add the original Model Context Protocol repository as an 'upstream' remote, allowing you to fetch and merge changes from the main project.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/CONTRIBUTING.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+git remote add upstream https://github.com/modelcontextprotocol/servers.git
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP GitLab Server Inputs via JSON
+DESCRIPTION: This JSON snippet configures inputs and server execution for an MCP GitLab server. It defines two inputs, `gitlab_token` and `gitlab_url`, which are mapped to environment variables (`GITLAB_PERSONAL_ACCESS_TOKEN`, `GITLAB_API_URL`) passed to the `npx` command executing the `@modelcontextprotocol/server-gitlab` package. The token is marked as a password input.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/gitlab/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "gitlab_token",
+        "description": "GitLab Personal Access Token",
+        "password": true
+      },
+      {
+        "type": "promptString",
+        "id": "gitlab_url",
+        "description": "GitLab API URL (optional)",
+        "default": "https://gitlab.com/api/v4"
+      }
+    ],
+    "servers": {
+      "gitlab": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-gitlab"
+        ],
+        "env": {
+          "GITLAB_PERSONAL_ACCESS_TOKEN": "${input:gitlab_token}",
+          "GITLAB_API_URL": "${input:gitlab_url}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code MCP Server - Sentry - JSON (uvx, Manual)
+DESCRIPTION: Manual JSON configuration for VS Code settings, defining the Sentry MCP server to run via uvx. It includes an input definition to prompt the user for the Sentry authentication token.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sentry/README.md#_snippet_5
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "auth_token",
+        "description": "Sentry Auth Token",
+        "password": true
+      }
+    ],
+    "servers": {
+      "sentry": {
+        "command": "uvx",
+        "args": ["mcp-server-sentry"],
+        "env": {
+          "SENTRY_AUTH_TOKEN": "${input:auth_token}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Claude Desktop Configuration for Everything Server
+DESCRIPTION: Provides the JSON configuration snippet required to add the 'Everything' MCP server to the Claude Desktop application using the stdio transport method.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everything/README.md#_snippet_2
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "everything": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everything"
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Building MCP Filesystem Server Docker Image
+DESCRIPTION: Bash command to build the Docker image for the MCP filesystem server. It tags the resulting image as `mcp/filesystem` using the `Dockerfile` located within the `src/filesystem` directory.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md#_snippet_4
+
+LANGUAGE: Bash
+CODE:
+```
+docker build -t mcp/filesystem -f src/filesystem/Dockerfile .
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop MCP Server - Sentry - JSON (pip)
+DESCRIPTION: JSON configuration snippet for adding the Sentry MCP server to Claude Desktop settings, running the server from a pip installation. Replace 'YOUR_SENTRY_TOKEN' with your actual Sentry authentication token.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sentry/README.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+"mcpServers": {
+  "sentry": {
+    "command": "python",
+    "args": ["-m", "mcp_server_sentry", "--auth-token", "YOUR_SENTRY_TOKEN"]
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Example MCP Tool Call: Get Current Time
+DESCRIPTION: This JSON object represents an example request sent to the Time MCP server to get the current time for a specific timezone using the 'get_current_time' tool. It includes the tool name and required 'timezone' argument.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md#_snippet_10
+
+LANGUAGE: json
+CODE:
+```
+{
+  "name": "get_current_time",
+  "arguments": {
+    "timezone": "Europe/Warsaw"
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop Memory Server with NPX - JSON
+DESCRIPTION: Provides the JSON configuration block for `claude_desktop_config.json` to set up the memory server using NPX. It specifies the `command` as "npx" and includes `args` to execute the `@modelcontextprotocol/server-memory` package.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Build Docker Image for Time MCP Server
+DESCRIPTION: These bash commands show how to navigate to the server's source directory and build a Docker image tagged as 'mcp/time'. This image can then be used to run the server in a containerized environment.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md#_snippet_16
+
+LANGUAGE: bash
+CODE:
+```
+cd src/time
+docker build -t mcp/time .
+```
+
+----------------------------------------
+
+TITLE: Building PostgreSQL MCP Server Docker Image (Shell)
+DESCRIPTION: This shell command builds the Docker image for the Model Context Protocol PostgreSQL server. It uses the `docker build` command, tags the resulting image as `mcp/postgres`, specifies the Dockerfile location (`src/postgres/Dockerfile`) using the `-f` flag, and sets the build context to the current directory (`.`). Successful execution creates a runnable Docker image for the server.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/postgres/README.md#_snippet_4
+
+LANGUAGE: sh
+CODE:
+```
+docker build -t mcp/postgres -f src/postgres/Dockerfile .
+```
+
+----------------------------------------
+
+TITLE: Building Brave Search MCP Server Docker Image
+DESCRIPTION: This bash command is used to build the Docker image for the Brave Search MCP server. It tags the resulting image as `mcp/brave-search` with the `latest` tag, using the Dockerfile located in the `src/brave-search/` directory relative to the current context (`.`). This command requires Docker to be installed and the source code available.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/brave-search/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+docker build -t mcp/brave-search:latest -f src/brave-search/Dockerfile .
+```
+
+----------------------------------------
+
+TITLE: Run MCP Everything Server (Default Stdio)
+DESCRIPTION: Executes the globally installed '@modelcontextprotocol/server-everything' package using npx, starting the server with the default stdio transport.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everything/README.md#_snippet_7
+
+LANGUAGE: shell
+CODE:
+```
+npx @modelcontextprotocol/server-everything
+```
+
+----------------------------------------
+
+TITLE: Example MCP Tool Call: Convert Time
+DESCRIPTION: This JSON object represents an example request sent to the Time MCP server to convert a specific time from one timezone to another using the 'convert_time' tool. It includes the source timezone, the time string, and the target timezone.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md#_snippet_12
+
+LANGUAGE: json
+CODE:
+```
+{
+  "name": "convert_time",
+  "arguments": {
+    "source_timezone": "America/New_York",
+    "time": "16:30",
+    "target_timezone": "Asia/Tokyo"
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Build GitHub MCP Server Docker Image (Bash)
+DESCRIPTION: Provides the Bash command to build the Docker image for the GitHub MCP server. It tags the resulting image as `mcp/github` using the `Dockerfile` located in the `src/github/` directory.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/github/README.md#_snippet_4
+
+LANGUAGE: Bash
+CODE:
+```
+docker build -t mcp/github -f src/github/Dockerfile .
+```
+
+----------------------------------------
+
+TITLE: Configure Memory Server in Claude Desktop (JSON)
+DESCRIPTION: This JSON configuration snippet shows how to define the Memory MCP server within the Claude Desktop client's settings, specifying the command and arguments needed to start it.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/README.md#_snippet_4
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Building EverArt Server Docker Image
+DESCRIPTION: This shell command builds the Docker image for the EverArt MCP server. It tags the resulting image as `mcp/everart` and uses the `Dockerfile` located in the `src/everart/` directory within the current context (`.`).
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everart/README.md#_snippet_7
+
+LANGUAGE: sh
+CODE:
+```
+docker build -t mcp/everart -f src/everart/Dockerfile .
+```
+
+----------------------------------------
+
+TITLE: Building Docker Image for MCP GitLab Server
+DESCRIPTION: This Bash command builds a Docker image for the MCP GitLab server. It uses the `docker build` command, specifying the Dockerfile located at `src/gitlab/Dockerfile` and tagging the resulting image as `vonwig/gitlab:mcp`. The command requires Docker to be installed and the specified Dockerfile to be present.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/gitlab/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+docker build -t vonwig/gitlab:mcp -f src/gitlab/Dockerfile .
+```
+
+----------------------------------------
+
+TITLE: Build Slack MCP Docker Image (Bash)
+DESCRIPTION: Bash command to build the Docker image for the Slack MCP server. This command tags the image as `mcp/slack` and uses the Dockerfile located in the `src/slack/` directory within the current build context.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/slack/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+docker build -t mcp/slack -f src/slack/Dockerfile .
+```
+
+----------------------------------------
+
+TITLE: Configure Claude.app for Time MCP Server using Docker
+DESCRIPTION: This JSON configuration snippet shows how to add the Time MCP server to Claude.app settings using Docker. It specifies the command as 'docker' and provides the necessary arguments to run the server from the 'mcp/time' Docker image.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "time": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "mcp/time"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code MCP with AWS KB Retrieval Server (NPX)
+DESCRIPTION: Provides the JSON configuration for the VS Code MCP extension to define inputs for AWS credentials and register the AWS Knowledge Base retrieval server using npx. It specifies the `npx` command and arguments, using templated input variables (`${input:aws_access_key}`, etc.) to dynamically inject user-provided credentials into the environment.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/aws-kb-retrieval-server/README.md#_snippet_2
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "aws_access_key",
+        "description": "AWS Access Key ID",
+        "password": true
+      },
+      {
+        "type": "promptString",
+        "id": "aws_secret_key",
+        "description": "AWS Secret Access Key",
+        "password": true
+      },
+      {
+        "type": "promptString",
+        "id": "aws_region",
+        "description": "AWS Region"
+      }
+    ],
+    "servers": {
+      "aws-kb-retrieval": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-aws-kb-retrieval"],
+        "env": {
+          "AWS_ACCESS_KEY_ID": "${input:aws_access_key}",
+          "AWS_SECRET_ACCESS_KEY": "${input:aws_secret_key}",
+          "AWS_REGION": "${input:aws_region}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring PostgreSQL MCP Server for VS Code (NPX)
+DESCRIPTION: This JSON block configures the Model Context Protocol server for PostgreSQL within VS Code settings or a workspace configuration file, specifying it should be launched using NPX. It defines an input prompt for the PostgreSQL URL and configures the "postgres" server to use the NPX command, passing the collected URL as an argument to the `@modelcontextprotocol/server-postgres` package. This enables VS Code extensions to interact with a PostgreSQL database via the MCP server running as a Node.js process managed by NPX, prompting for the connection details dynamically.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/postgres/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "pg_url",
+        "description": "PostgreSQL URL (e.g. postgresql://user:pass@localhost:5432/mydb)"
+      }
+    ],
+    "servers": {
+      "postgres": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-postgres",
+          "${input:pg_url}"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code Settings for EverArt Server using NPX
+DESCRIPTION: This JSON snippet configures the EverArt MCP server manually in VS Code settings or a `.vscode/mcp.json` file. It includes an input definition to prompt the user for the API key and a server definition that uses 'npx' to run the server package, passing the input key as an environment variable.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everart/README.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "everart_api_key",
+        "description": "EverArt API Key",
+        "password": true
+      }
+служи    ],
+    "servers": {
+      "everart": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-everart"],
+        "env": {
+          "EVERART_API_KEY": "${input:everart_api_key}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code MCP with AWS KB Retrieval Server (Docker)
+DESCRIPTION: Provides the JSON configuration for the VS Code MCP extension to define inputs for AWS credentials and register the AWS Knowledge Base retrieval server using Docker. It specifies the `docker` command and arguments, using templated input variables (`${input:aws_access_key}`, etc.) to dynamically inject user-provided credentials into the container's environment.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/aws-kb-retrieval-server/README.md#_snippet_3
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "aws_access_key",
+        "description": "AWS Access Key ID",
+        "password": true
+      },
+      {
+        "type": "promptString",
+        "id": "aws_secret_key",
+        "description": "AWS Secret Access Key",
+        "password": true
+      },
+      {
+        "type": "promptString",
+        "id": "aws_region",
+        "description": "AWS Region"
+      }
+    ],
+    "servers": {
+      "aws-kb-retrieval": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/aws-kb-retrieval-server"],
+        "env": {
+          "AWS_ACCESS_KEY_ID": "${input:aws_access_key}",
+          "AWS_SECRET_ACCESS_KEY": "${input:aws_secret_key}",
+          "AWS_REGION": "${input:aws_region}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop Memory Server with Custom File Path (NPX) - JSON
+DESCRIPTION: Shows how to configure the memory server using NPX and specify a custom location for the memory storage file. It adds an `env` block to the configuration, setting the `MEMORY_FILE_PATH` environment variable.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_5
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": "/path/to/custom/memory.json"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Puppeteer MCP Server with Docker
+DESCRIPTION: This JSON configuration block defines how to launch the Puppeteer Model Context Protocol server using Docker. It specifies the 'docker' command and arguments to run the 'mcp/puppeteer' image in an interactive, auto-removing container with initialization and an environment variable indicating it's a Docker container.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/puppeteer/README.md#_snippet_0
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "puppeteer": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--init",
+        "-e",
+        "DOCKER_CONTAINER=true",
+        "mcp/puppeteer"
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Run MCP Everything Server (Explicit Stdio)
+DESCRIPTION: Executes the globally installed '@modelcontextprotocol/server-everything' package using npx, explicitly specifying the stdio transport.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everything/README.md#_snippet_8
+
+LANGUAGE: shell
+CODE:
+```
+npx @modelcontextprotocol/server-everything stdio
+```
+
+----------------------------------------
+
+TITLE: Building and Running MCP Server Commands
+DESCRIPTION: Set of npm commands for building, testing, and running the MCP server in different modes including stdio and SSE transport options.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everything/CLAUDE.md#2025-04-21_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm run build
+```
+
+LANGUAGE: bash
+CODE:
+```
+npm run watch
+```
+
+LANGUAGE: bash
+CODE:
+```
+npm run start
+```
+
+LANGUAGE: bash
+CODE:
+```
+npm run start:sse
+```
+
+LANGUAGE: bash
+CODE:
+```
+npm run prepare
+```
+
+----------------------------------------
+
+TITLE: Configure Claude.app with Docker
+DESCRIPTION: JSON configuration snippet to add the fetch MCP server to Claude.app settings, running the server from a specified Docker container image.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/fetch/README.md#_snippet_3
+
+LANGUAGE: JSON
+CODE:
+```
+"mcpServers": {
+  "fetch": {
+    "command": "docker",
+    "args": ["run", "-i", "--rm", "mcp/fetch"]
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP Filesystem Server with Docker for VS Code
+DESCRIPTION: Example JSON configuration for VS Code settings (`settings.json` or `.vscode/mcp.json`) to run the filesystem MCP server using Docker, mounting the current workspace folder (`${workspaceFolder}`) to the server's `/projects/workspace` path.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md#_snippet_2
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "filesystem": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "--mount", "type=bind,src=${workspaceFolder},dst=/projects/workspace",
+          "mcp/filesystem",
+          "/projects"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code MCP Memory Server with Docker - JSON
+DESCRIPTION: Provides the JSON configuration block for VS Code settings (`settings.json` or `.vscode/mcp.json`) to set up the memory server using Docker. It nests the configuration under `mcp.servers.memory` and specifies the `command` and `args` for Docker execution, including volume mounting.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_7
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "memory": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "-v",
+          "claude-memory:/app/dist",
+          "--rm",
+          "mcp/memory"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure VS Code User Settings for Time MCP Server using uvx
+DESCRIPTION: This JSON snippet shows how to manually add the Time MCP server configuration to VS Code User Settings (JSON) or a `.vscode/mcp.json` file using uvx. It defines the server under the 'mcp.servers' key.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md#_snippet_7
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "time": {
+        "command": "uvx",
+        "args": ["mcp-server-time"]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: One-Click Install Configuration (NPX) - JSON
+DESCRIPTION: Provides the JSON configuration structure embedded in a VS Code one-click install link for setting up the memory server using NPX. It specifies the `command` and `args` needed for VS Code to initiate the installation process via NPX.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_9
+
+LANGUAGE: json
+CODE:
+```
+{"command":"npx","args":["-y","@modelcontextprotocol/server-memory"]}
+```
+
+----------------------------------------
+
+TITLE: One-Click Install Configuration (NPX Insiders) - JSON
+DESCRIPTION: Provides the JSON configuration structure embedded in a VS Code Insiders one-click install link for setting up the memory server using NPX. It is identical to the standard VS Code NPX config but targets the Insiders build.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_10
+
+LANGUAGE: json
+CODE:
+```
+{"command":"npx","args":["-y","@modelcontextprotocol/server-memory"]}
+```
+
+----------------------------------------
+
+TITLE: One-Click Install Configuration (Docker) - JSON
+DESCRIPTION: Provides the JSON configuration structure embedded in a VS Code one-click install link for setting up the memory server using Docker. It specifies the `command` and `args` needed for VS Code to initiate the installation process via Docker.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_11
+
+LANGUAGE: json
+CODE:
+```
+{"command":"docker","args":["run","-i","-v","claude-memory:/app/dist","--rm","mcp/memory"]}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code MCP Server (Docker) - JSON
+DESCRIPTION: JSON configuration block to add the sequential-thinking MCP server to your VS Code settings (either user settings or a workspace `.vscode/mcp.json` file) using Docker. It specifies the server configuration under the `mcp.servers` key, including the command (`docker`) and arguments to run the container.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sequentialthinking/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "sequential-thinking": {
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "mcp/sequentialthinking"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure VS Code User Settings for Time MCP Server using Docker
+DESCRIPTION: This JSON snippet shows how to manually add the Time MCP server configuration to VS Code User Settings (JSON) or a `.vscode/mcp.json` file using Docker. It specifies the Docker command and image under the 'mcp.servers' key.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md#_snippet_8
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "time": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/time"]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure VS Code User Settings (.vscode/mcp.json) with uvx
+DESCRIPTION: JSON configuration snippet for integrating the fetch MCP server into VS Code workspace settings using the .vscode/mcp.json file and executing the server via uvx. Requires the 'mcp' key.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/fetch/README.md#_snippet_5
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "fetch": {
+        "command": "uvx",
+        "args": ["mcp-server-fetch"]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Building Memory Server Docker Image - Shell
+DESCRIPTION: Provides the shell command to build the Docker image for the knowledge graph memory server. It uses the `docker build` command, tags the image as `mcp/memory`, and specifies the Dockerfile location (`src/memory/Dockerfile`) and build context (`.`).
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_8
+
+LANGUAGE: shell
+CODE:
+```
+docker build -t mcp/memory -f src/memory/Dockerfile .
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code MCP Memory Server with NPX - JSON
+DESCRIPTION: Provides the JSON configuration block for VS Code settings (`settings.json` or `.vscode/mcp.json`) to set up the memory server using NPX. It nests the configuration under `mcp.servers.memory` and specifies the `command` and `args` for NPX execution.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_6
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "memory": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-memory"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code MCP Server (npx) - JSON
+DESCRIPTION: JSON configuration block to add the sequential-thinking MCP server to your VS Code settings (either user settings or a workspace `.vscode/mcp.json` file) using npx. It specifies the server configuration under the `mcp.servers` key, including the command (`npx`) and arguments.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sequentialthinking/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "sequential-thinking": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-sequential-thinking"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Installing EverArt MCP Server Dependencies and Setting API Key
+DESCRIPTION: These bash commands install the necessary Node.js dependencies for the EverArt MCP server using npm and then set the EverArt API key as an environment variable required by the server to authenticate with the EverArt API.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everart/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install
+export EVERART_API_KEY=your_key_here
+```
+
+----------------------------------------
+
+TITLE: Configure Redis MCP Server in VS Code Settings (Docker) (JSON)
+DESCRIPTION: JSON configuration snippet for integrating the Redis MCP server into VS Code User Settings (`settings.json`) or workspace settings (`.vscode/mcp.json`) using Docker. It defines a prompt to get the Redis URL from the user and configures the server execution via the `docker run` command and arguments, setting the Redis URL via an environment variable.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/redis/README.md#_snippet_3
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "redis_url",
+        "description": "Redis URL (e.g. redis://host.docker.internal:6379)"
+      }
+    ],
+    "servers": {
+      "redis": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/redis"],
+        "env": {
+          "REDIS_URL": "${input:redis_url}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring GDrive Server with NPX in VS Code
+DESCRIPTION: This JSON block is intended for inclusion in VS Code's User Settings (JSON) or a .vscode/mcp.json file to configure the GDrive server using npx. It specifies the command, arguments, and sets an environment variable for the credentials path.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/gdrive/README.md#_snippet_3
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "gdrive": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-gdrive"
+        ],
+        "env": {
+          "GDRIVE_CREDENTIALS_PATH": "/path/to/.gdrive-server-credentials.json"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP SQLite Server with uvx for VS Code
+DESCRIPTION: This JSON snippet provides the configuration structure for integrating the SQLite MCP server into VS Code via `mcp.json` or user settings. It defines an input prompt for the database path and configures the server entry using `uvx` as the command, passing the user-provided database path as an argument. This allows VS Code extensions to manage and interact with the server.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sqlite/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "db_path",
+        "description": "SQLite Database Path",
+        "default": "${workspaceFolder}/db.sqlite"
+      }
+    ],
+    "servers": {
+      "sqlite": {
+        "command": "uvx",
+        "args": [
+          "mcp-server-sqlite",
+          "--db-path",
+          "${input:db_path}"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure MCP Server in VS Code Settings
+DESCRIPTION: Adds a configuration block to VS Code user settings (settings.json) or a workspace .vscode/mcp.json file to define the 'everything' MCP server using npx. This allows VS Code extensions to discover and use the server.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everything/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "everything": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-everything"]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP Puppeteer Server with NPX in VS Code (JSON)
+DESCRIPTION: This JSON block configures the MCP Puppeteer server to run using NPX within VS Code settings. It specifies the command (`npx`) and arguments (`-y`, `@modelcontextprotocol/server-puppeteer`) needed to launch the server.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/puppeteer/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "puppeteer": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure VS Code with GitLab MCP via Docker (Manual)
+DESCRIPTION: Provides the JSON configuration block to add to VS Code User Settings (JSON) or .vscode/mcp.json for integrating the GitLab MCP server using a Docker container. It includes input prompts for collecting the token and URL from the user and defines the Docker command, arguments, and environment variables using input placeholders. Requires Docker to be installed and the mcp/gitlab image available.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/gitlab/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "gitlab_token",
+        "description": "GitLab Personal Access Token",
+        "password": true
+      },
+      {
+        "type": "promptString",
+        "id": "gitlab_url",
+        "description": "GitLab API URL (optional)",
+        "default": "https://gitlab.com/api/v4"
+      }
+    ],
+    "servers": {
+      "gitlab": {
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "mcp/gitlab"
+        ],
+        "env": {
+          "GITLAB_PERSONAL_ACCESS_TOKEN": "${input:gitlab_token}",
+          "GITLAB_API_URL": "${input:gitlab_url}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Claude.app for Time MCP Server using uvx
+DESCRIPTION: This JSON configuration snippet shows how to add the Time MCP server to Claude.app settings using uvx to run the server command. It defines the server name and the command/arguments needed to launch it via uvx.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code with mcp-server-git (Docker)
+DESCRIPTION: Adds an MCP server configuration for git to VS Code settings (User or Workspace), using a Docker container to run the server command and mounting the workspace folder.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/git/README.md#_snippet_6
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "git": {
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "--mount", "type=bind,src=${workspaceFolder},dst=/workspace",
+          "mcp/git"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure GitHub MCP Server in VS Code Settings (Docker)
+DESCRIPTION: Provides the JSON configuration block to add to your VS Code User Settings (JSON) file to integrate the GitHub MCP server using Docker. This configuration prompts for the GitHub token when needed.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/github/README.md#_snippet_2
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "github_token",
+        "description": "GitHub Personal Access Token",
+        "password": true
+      }
+    ],
+    "servers": {
+      "github": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/github"],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_token}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Installing MCP Sentry Server - Python - Bash
+DESCRIPTION: Standard command for installing the mcp-server-sentry Python package using the pip package manager. This makes the server available as a Python module.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sentry/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+pip install mcp-server-sentry
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP Filesystem Server with NPX for Claude Desktop
+DESCRIPTION: Example JSON configuration for `claude_desktop_config.json` to run the filesystem MCP server using NPX, specifying allowed local directories as command-line arguments.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md#_snippet_1
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/username/Desktop",
+        "/path/to/other/allowed/dir"
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Google Maps MCP Server in Claude Desktop (Docker)
+DESCRIPTION: This JSON configuration block is added to `claude_desktop_config.json` to enable the Google Maps MCP server using Docker. It specifies the Docker command and arguments needed to run the container, passing the Google Maps API key as an environment variable.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/google-maps/README.md#_snippet_0
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "google-maps": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GOOGLE_MAPS_API_KEY",
+        "mcp/google-maps"
+      ],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "<YOUR_API_KEY>"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP Puppeteer Server with Launch Options via Env Var (JSON)
+DESCRIPTION: This JSON block configures the MCP Puppeteer server using NPX and passes custom Puppeteer launch options via the `PUPPETEER_LAUNCH_OPTIONS` environment variable. The launch options are provided as a JSON-encoded string within the `env` object.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/puppeteer/README.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "mcp-puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "env": {
+        "PUPPETEER_LAUNCH_OPTIONS": "{ \"headless\": false, \"executablePath\": \"C:/Program Files/Google/Chrome/Application/chrome.exe\", \"args\": [] }",
+        "ALLOW_DANGEROUS": "true"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop with AWS KB Retrieval Server (NPX)
+DESCRIPTION: Provides the JSON configuration required to register the AWS Knowledge Base retrieval server with Claude Desktop using npx. It specifies the `npx` command and arguments to execute the server package directly, passing AWS credentials as environment variables from the host environment.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/aws-kb-retrieval-server/README.md#_snippet_1
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "aws-kb-retrieval": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-aws-kb-retrieval"],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "YOUR_ACCESS_KEY_HERE",
+        "AWS_SECRET_ACCESS_KEY": "YOUR_SECRET_ACCESS_KEY_HERE",
+        "AWS_REGION": "YOUR_AWS_REGION_HERE"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring MCP SQLite Server with Docker for Claude Desktop
+DESCRIPTION: This JSON snippet demonstrates how to configure the SQLite MCP server using Docker within the Claude Desktop configuration file (`claude_desktop_config.json`). It sets `docker` as the command and includes arguments to run the `mcp/sqlite` container, removing it after exit, mapping a volume for persistent data, and specifying the database path inside the container.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sqlite/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+"mcpServers": {
+  "sqlite": {
+    "command": "docker",
+    "args": [
+      "run",
+      "--rm",
+      "-i",
+      "-v",
+      "mcp-test:/mcp",
+      "mcp/sqlite",
+      "--db-path",
+      "/mcp/test.db"
+    ]
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Slack MCP Server in Claude Desktop (NPX)
+DESCRIPTION: JSON configuration snippet to be added to the `claude_desktop_config.json` file to integrate the Slack MCP server when running it via NPX. It specifies the command, arguments, and environment variables required, including placeholders for the Slack Bot Token, Team ID, and optional Channel IDs.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/slack/README.md#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "slack": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-slack"
+      ],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-your-bot-token",
+        "SLACK_TEAM_ID": "T01234567",
+        "SLACK_CHANNEL_IDS": "C01234567, C76543210"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Manual VS Code Configuration for Brave Search MCP Server (NPX)
+DESCRIPTION: This JSON snippet provides the configuration block for setting up the Brave Search MCP server within VS Code using NPX. It defines an input prompt for the API key and configures the 'brave-search' server to run via the `@modelcontextprotocol/server-brave-search` NPX package, injecting the prompted API key as an environment variable. This can be added to VS Code User Settings (JSON) or a `.vscode/mcp.json` file.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/brave-search/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "brave_api_key",
+        "description": "Brave Search API Key",
+        "password": true
+      }
+    ],
+    "servers": {
+      "brave-search": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+        "env": {
+          "BRAVE_API_KEY": "${input:brave_api_key}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Google Maps MCP Server in VS Code (Manual Docker)
+DESCRIPTION: This JSON configuration block is added to VS Code user settings or `.vscode/mcp.json` to configure the Google Maps MCP server via Docker. It defines an input prompt for the API key and sets the server command using Docker, referencing the dynamically provided API key.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/google-maps/README.md#_snippet_3
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "maps_api_key",
+        "description": "Google Maps API Key",
+        "password": true
+      }
+    ],
+    "servers": {
+      "google-maps": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/google-maps"],
+        "env": {
+          "GOOGLE_MAPS_API_KEY": "${input:maps_api_key}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop with EverArt Server using Docker
+DESCRIPTION: This JSON snippet provides the configuration for Claude Desktop to integrate the EverArt MCP server. It defines an 'everart' server entry that specifies 'docker' as the command, includes arguments to run the container interactively and remove it upon exit, passes the EVERART_API_KEY environment variable, and sets the required environment variable within the configuration.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everart/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "everart": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-e", "EVERART_API_KEY", "mcp/everart"],
+      "env": {
+        "EVERART_API_KEY": "your_key_here"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code MCP Server - Sentry - JSON (Docker, Manual)
+DESCRIPTION: Manual JSON configuration for VS Code settings, defining the Sentry MCP server to run from a Docker container. It includes an input definition to prompt the user for the Sentry authentication token.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sentry/README.md#_snippet_6
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "auth_token",
+        "description": "Sentry Auth Token",
+        "password": true
+      }
+    ],
+    "servers": {
+      "sentry": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/sentry"],
+        "env": {
+          "SENTRY_AUTH_TOKEN": "${input:auth_token}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Puppeteer MCP Server with NPX
+DESCRIPTION: This JSON configuration block defines how to launch the Puppeteer Model Context Protocol server using NPX. It specifies the 'npx' command and arguments to execute the '@modelcontextprotocol/server-puppeteer' package directly, typically used for local development or testing without a full Docker setup.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/puppeteer/README.md#_snippet_1
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop Memory Server with Docker - JSON
+DESCRIPTION: Provides the JSON configuration block to add to `claude_desktop_config.json` for setting up the memory server using Docker. It specifies the `command` as "docker" and includes `args` to run the container, mount a volume for persistence, and remove the container after exit.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "memory": {
+      "command": "docker",
+      "args": ["run", "-i", "-v", "claude-memory:/app/dist", "--rm", "mcp/memory"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure GitHub MCP Server in VS Code Settings (NPX)
+DESCRIPTION: Provides the JSON configuration block to add to your VS Code User Settings (JSON) file to integrate the GitHub MCP server using NPX. This configuration prompts for the GitHub token when needed.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/github/README.md#_snippet_3
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "github_token",
+        "description": "GitHub Personal Access Token",
+        "password": true
+      }
+    ],
+    "servers": {
+      "github": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-github"
+        ],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_token}"
+        }
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Claude Desktop with GitLab MCP via NPX
+DESCRIPTION: Provides the JSON configuration block to add to claude_desktop_config.json for integrating the GitLab MCP server using NPX. It specifies the NPX command, arguments, and environment variables needed, including placeholder values for the GitLab Personal Access Token and API URL. Requires Node.js and NPX installed.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/gitlab/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "gitlab": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-gitlab"
+      ],
+      "env": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>",
+        "GITLAB_API_URL": "https://gitlab.com/api/v4" // Optional, for self-hosted instances
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Brave Search MCP Server with Docker for Claude Desktop
+DESCRIPTION: This JSON snippet shows how to configure the Brave Search MCP server to run via Docker within the Claude Desktop application. It should be added to the `mcpServers` section of your `claude_desktop_config.json` file. Ensure the `BRAVE_API_KEY` environment variable is set, replacing 'YOUR_API_KEY_HERE' with your actual key.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/brave-search/README.md#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "brave-search": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "BRAVE_API_KEY",
+        "mcp/brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_API_KEY_HERE"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Brave Search MCP Server with NPX for Claude Desktop
+DESCRIPTION: This JSON snippet demonstrates how to configure the Brave Search MCP server to run using NPX within the Claude Desktop application. It should be added to the `mcpServers` section of your `claude_desktop_config.json` file. Ensure the `BRAVE_API_KEY` environment variable is set, replacing 'YOUR_API_KEY_HERE' with your actual key.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/brave-search/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "brave-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_API_KEY_HERE"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring VS Code with mcp-server-git (uvx)
+DESCRIPTION: Adds an MCP server configuration for git to VS Code settings (User or Workspace), using uvx as the command to run the server.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/git/README.md#_snippet_5
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "git": {
+        "command": "uvx",
+        "args": ["mcp-server-git"]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure GitHub MCP Server in Claude Desktop (Docker)
+DESCRIPTION: Provides the JSON configuration block to add to your `claude_desktop_config.json` file to run the GitHub MCP server using Docker. Ensure you replace `<YOUR_TOKEN>` with your actual GitHub Personal Access Token.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/github/README.md#_snippet_0
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "github": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "mcp/github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Zed Context Server - Sentry - JSON (pip)
+DESCRIPTION: JSON configuration snippet for adding the Sentry MCP server as a context server in Zed editor settings, running the server from a pip installation. Replace 'YOUR_SENTRY_TOKEN' with your Sentry authentication token.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sentry/README.md#_snippet_8
+
+LANGUAGE: json
+CODE:
+```
+"context_servers": {
+  "mcp-server-sentry": {
+    "command": "python",
+    "args": ["-m", "mcp_server_sentry", "--auth-token", "YOUR_SENTRY_TOKEN"]
+  }
+},
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop with mcp-server-git (uvx)
+DESCRIPTION: Adds an MCP server configuration for git to Claude Desktop's settings JSON, specifying uvx as the command to run the server.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/git/README.md#_snippet_2
+
+LANGUAGE: JSON
+CODE:
+```
+"mcpServers": {
+  "git": {
+    "command": "uvx",
+    "args": ["mcp-server-git", "--repository", "path/to/git/repo"]
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring GDrive Server with Docker in VS Code
+DESCRIPTION: This JSON block is for configuring the GDrive server within VS Code settings using Docker. It defines the command to run the Docker container, including arguments for interactive mode, auto-removal, volume mounting, setting the credentials path via an environment variable, and specifying the Docker image.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/gdrive/README.md#_snippet_4
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcp": {
+    "servers": {
+      "gdrive": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "-v",
+          "mcp-gdrive:/gdrive-server",
+          "-e",
+          "GDRIVE_CREDENTIALS_PATH=/gdrive-server/credentials.json",
+          "mcp/gdrive"
+        ]
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop MCP Server - Sentry - JSON (Docker)
+DESCRIPTION: JSON configuration snippet for adding the Sentry MCP server to Claude Desktop settings, using a Docker container. Replace 'YOUR_SENTRY_TOKEN' with your actual Sentry authentication token.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sentry/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+"mcpServers": {
+  "sentry": {
+    "command": "docker",
+    "args": ["run", "-i", "--rm", "mcp/sentry", "--auth-token", "YOUR_SENTRY_TOKEN"]
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop with mcp-server-git (Pip)
+DESCRIPTION: Adds an MCP server configuration for git to Claude Desktop's settings JSON, running the server directly via the python interpreter after a pip installation.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/git/README.md#_snippet_4
+
+LANGUAGE: JSON
+CODE:
+```
+"mcpServers": {
+  "git": {
+    "command": "python",
+    "args": ["-m", "mcp_server_git", "--repository", "path/to/git/repo"]
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop MCP Server - Sentry - JSON (uvx)
+DESCRIPTION: JSON configuration snippet for adding the Sentry MCP server to Claude Desktop settings, utilizing uvx to run the server directly. Replace 'YOUR_SENTRY_TOKEN' with your actual Sentry authentication token.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sentry/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+"mcpServers": {
+  "sentry": {
+    "command": "uvx",
+    "args": ["mcp-server-sentry", "--auth-token", "YOUR_SENTRY_TOKEN"]
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop with EverArt Server using NPX
+DESCRIPTION: This JSON snippet provides the configuration for Claude Desktop to integrate the EverArt MCP server. It defines an 'everart' server entry that specifies 'npx' as the command, includes arguments to execute the `@modelcontextprotocol/server-everart` package directly, and sets the required EVERART_API_KEY environment variable within the configuration.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/everart/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "everart": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everart"],
+      "env": {
+        "EVERART_API_KEY": "your_key_here"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop MCP Server (Docker) - JSON
+DESCRIPTION: Configuration snippet to add the sequential-thinking MCP server to your Claude Desktop configuration using Docker. This block defines the server's name, the command to execute (`docker`), and the arguments needed to run the Docker container for the server.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sequentialthinking/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "sequentialthinking": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "mcp/sequentialthinking"
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure GitHub MCP Server in Claude Desktop (NPX)
+DESCRIPTION: Provides the JSON configuration block to add to your `claude_desktop_config.json` file to run the GitHub MCP server using NPX. Ensure you replace `<YOUR_TOKEN>` with your actual GitHub Personal Access Token.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/github/README.md#_snippet_1
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop with mcp-server-git (Docker)
+DESCRIPTION: Adds an MCP server configuration for git to Claude Desktop's settings JSON, using a Docker container to run the server command. Requires Docker installed and path substitution.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/git/README.md#_snippet_3
+
+LANGUAGE: JSON
+CODE:
+```
+"mcpServers": {
+  "git": {
+    "command": "docker",
+    "args": ["run", "--rm", "-i", "--mount", "type=bind,src=/Users/username,dst=/Users/username", "mcp/git"]
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop MCP Server (npx) - JSON
+DESCRIPTION: Configuration snippet to add the sequential-thinking MCP server to your Claude Desktop configuration using npx. This block defines the server's name, the command to execute (`npx`), and the necessary arguments to run the server package.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/sequentialthinking/README.md#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Google Drive MCP Server Configuration for Desktop App (Docker)
+DESCRIPTION: JSON configuration snippet for integrating the Google Drive MCP server into a desktop application's server settings using Docker. Assumes credentials have been saved in the mcp-gdrive volume.
+SOURCE: https://github.com/modelcontextprotocol/servers/blob/main/src/gdrive/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "mcpServers": {
+    "gdrive": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-v", "mcp-gdrive:/gdrive-server", "-e", "GDRIVE_CREDENTIALS_PATH=/gdrive-server/credentials.json", "mcp/gdrive"]
+    }
+  }
+}
+```

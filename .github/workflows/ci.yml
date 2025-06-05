@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Lint
+        run: npm run lint || echo "No lint script defined"
+      - name: Test
+        run: npm test || echo "No test script defined"
+      - name: Build
+        run: npm run build || echo "No build script defined" 

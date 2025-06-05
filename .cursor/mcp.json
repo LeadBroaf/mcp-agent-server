@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "disabled": false,
+      "autoApprove": []
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@itseasy21/mcp-knowledge-graph"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": "C:\\Users\\msmit\\mcp-agent-server\\memory\\mcp-agent.jsonl"
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+  }
+}
+} 

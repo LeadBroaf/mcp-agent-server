@@ -1,0 +1,809 @@
+TITLE: Define Docker Compose Services in YAML
+DESCRIPTION: This YAML snippet defines the services for a multi-container application using the Docker Compose file format. It includes a 'web' service that builds from the current directory and a 'redis' service using the official Redis image.
+SOURCE: https://github.com/docker/compose/blob/main/README.md#_snippet_0
+
+LANGUAGE: YAML
+CODE:
+```
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+  redis:
+    image: redis
+```
+
+----------------------------------------
+
+TITLE: Run a command and remove container afterwards
+DESCRIPTION: Executes a command (`python manage.py db upgrade`) in a new container for the specified service (`web`). The `--rm` flag ensures the container is automatically removed after the command finishes, overriding any restart policy defined for the service.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_5
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run --rm web python manage.py db upgrade
+```
+
+----------------------------------------
+
+TITLE: Initial Webapp Service Configuration (YAML)
+DESCRIPTION: Defines the initial configuration for a `webapp` service within a `compose.yaml` file. It specifies the Docker image, maps ports, and defines a volume.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose.md#_snippet_2
+
+LANGUAGE: yaml
+CODE:
+```
+services:
+  webapp:
+    image: examples/web
+    ports:
+      - "8000:8000"
+    volumes:
+      - "/data"
+```
+
+----------------------------------------
+
+TITLE: Run a command in a service container (basic)
+DESCRIPTION: Starts the specified service (`web`) and executes the given command (`bash`) within a new container based on the service configuration. This overrides the default command defined in the service.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_0
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run web bash
+```
+
+----------------------------------------
+
+TITLE: Overriding Webapp Service Configuration (YAML)
+DESCRIPTION: Shows how a subsequent Compose file (e.g., `compose.admin.yaml`) can override or add to the configuration of an existing service like `webapp`. This snippet adds a build context and environment variables.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose.md#_snippet_3
+
+LANGUAGE: yaml
+CODE:
+```
+services:
+  webapp:
+    build: .
+    environment:
+      - DEBUG=1
+```
+
+----------------------------------------
+
+TITLE: List Running Docker Compose Containers (Console)
+DESCRIPTION: Lists only the currently running containers for the active Docker Compose project, showing their name, image, command, service, creation time, status, and exposed ports.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_0
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose ps
+NAME            IMAGE     COMMAND           SERVICE    CREATED         STATUS          PORTS
+example-foo-1   alpine    "/entrypoint.…"   foo        4 seconds ago   Up 2 seconds    0.0.0.0:8080->80/tcp
+```
+
+----------------------------------------
+
+TITLE: List All Docker Compose Containers (Console)
+DESCRIPTION: Lists all containers for the active Docker Compose project, including both running and stopped containers, showing their name, image, command, service, creation time, status, and exposed ports.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_1
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose ps --all
+NAME            IMAGE     COMMAND           SERVICE    CREATED         STATUS          PORTS
+example-foo-1   alpine    "/entrypoint.…"   foo        4 seconds ago   Up 2 seconds    0.0.0.0:8080->80/tcp
+example-bar-1   alpine    "/entrypoint.…"   bar        4 seconds ago   exited (0)
+```
+
+----------------------------------------
+
+TITLE: List Running Containers (Default) - Docker Compose
+DESCRIPTION: Lists containers for the Compose project, showing only running containers by default.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_2
+
+LANGUAGE: console
+CODE:
+```
+docker compose ps
+```
+
+----------------------------------------
+
+TITLE: List All Containers (--all) - Docker Compose
+DESCRIPTION: Lists all containers for the Compose project, including stopped ones, using the --all flag.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_3
+
+LANGUAGE: console
+CODE:
+```
+docker compose ps --all
+```
+
+----------------------------------------
+
+TITLE: Running a command with Docker Compose
+DESCRIPTION: Starts the specified service and runs a one-time command within a new container based on the service configuration. This command overrides the default command defined in the service.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_6
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run web bash
+```
+
+----------------------------------------
+
+TITLE: Execute Shell in Web Service Container
+DESCRIPTION: This command executes a shell (`sh`) inside the container for the service named `web`. It allocates a TTY by default, providing an interactive prompt.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_exec.md#_snippet_0
+
+LANGUAGE: shell
+CODE:
+```
+docker compose exec web sh
+```
+
+----------------------------------------
+
+TITLE: Run a command with service ports mapped
+DESCRIPTION: Executes a command (`python manage.py shell`) in a new container for the specified service (`web`), ensuring that the ports defined in the service configuration are created and mapped to the host using the `--service-ports` flag.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_1
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run --service-ports web python manage.py shell
+```
+
+----------------------------------------
+
+TITLE: Specify Project Name with -p Flag (Console)
+DESCRIPTION: This snippet demonstrates using the `-p` flag with `docker compose` commands to explicitly set a project name. This overrides the default naming based on the directory structure. It shows listing services (`ps -a`) and viewing logs (`logs`) for services within the specified project.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose.md#_snippet_5
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose -p my_project ps -a
+NAME                 SERVICE    STATUS     PORTS
+my_project_demo_1    demo       running
+
+$ docker compose -p my_project logs
+demo_1  | PING localhost (127.0.0.1): 56 data bytes
+demo_1  | 64 bytes from 127.0.0.1: seq=0 ttl=64 time=0.095 ms
+```
+
+----------------------------------------
+
+TITLE: Running with service ports mapped
+DESCRIPTION: Executes a command in a new container, ensuring that the ports specified in the service configuration are created and mapped to the host, similar to `docker compose up`.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_7
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run --service-ports web python manage.py shell
+```
+
+----------------------------------------
+
+TITLE: Run a command with manual port mapping
+DESCRIPTION: Runs a command (`python manage.py shell`) in a new container for the specified service (`web`), manually mapping specific host ports to container ports using the `--publish` or `-p` options.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_2
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run --publish 8080:80 -p 2022:22 -p 127.0.0.1:2021:21 web python manage.py shell
+```
+
+----------------------------------------
+
+TITLE: Running and removing container afterwards
+DESCRIPTION: Executes a command in a new container and automatically removes the container once the command finishes, regardless of the container's restart policy defined in the service configuration.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_11
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run --rm web python manage.py db upgrade
+```
+
+----------------------------------------
+
+TITLE: Running with manual port mapping
+DESCRIPTION: Runs a command in a new container and manually maps specific ports from the container to the host using the `--publish` or `-p` options, similar to `docker run`.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_8
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run --publish 8080:80 -p 2022:22 -p 127.0.0.1:2021:21 web python manage.py shell
+```
+
+----------------------------------------
+
+TITLE: Run a command interacting with linked services
+DESCRIPTION: Executes a command (`psql -h db -U docker`) in a new container for the specified service (`db`). If the service is linked to others, `docker compose run` will ensure those linked services are running before executing the command. This example opens an interactive PostgreSQL shell.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_3
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run db psql -h db -U docker
+```
+
+----------------------------------------
+
+TITLE: Basic docker compose command syntax
+DESCRIPTION: This snippet shows the general command-line syntax for invoking docker compose, including optional arguments, options, the subcommand, and its arguments.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose.md#_snippet_0
+
+LANGUAGE: text
+CODE:
+```
+docker compose [-f <arg>...] [options] [COMMAND] [ARGS...]
+```
+
+----------------------------------------
+
+TITLE: Run a command without starting linked services
+DESCRIPTION: Executes a command (`python manage.py shell`) in a new container for the specified service (`web`). The `--no-deps` flag prevents `docker compose run` from starting any services that the target service (`web`) is linked to.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_4
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run --no-deps web python manage.py shell
+```
+
+----------------------------------------
+
+TITLE: Removing stopped containers interactively
+DESCRIPTION: Demonstrates running `docker compose rm` without options, showing the interactive prompt to confirm removal of a one-off container created by `docker compose run`.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_rm.md#_snippet_0
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose rm
+Going to remove djangoquickstart_web_run_1
+Are you sure? [yN] y
+Removing djangoquickstart_web_run_1 ... done
+```
+
+----------------------------------------
+
+TITLE: Running a Service with Multiple Compose Files (Console)
+DESCRIPTION: Demonstrates using the `-f` flag multiple times on the command line to combine configurations from `compose.yaml` and `compose.admin.yaml` before running the `backup_db` service. Subsequent files override or add to preceding ones.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose.md#_snippet_1
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose -f compose.yaml -f compose.admin.yaml run backup_db
+```
+
+----------------------------------------
+
+TITLE: Displaying running processes with docker compose top (Console)
+DESCRIPTION: This example demonstrates how to use `docker compose top` to view the processes running inside the containers of a Compose project. The output lists the services and the processes running within their containers, similar to the standard `top` command.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_top.md#_snippet_0
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose top
+example_foo_1
+UID    PID      PPID     C    STIME   TTY   TIME       CMD
+root   142353   142331   2    15:33   ?     00:00:00   ping localhost -c 5
+```
+
+----------------------------------------
+
+TITLE: Running without starting dependencies
+DESCRIPTION: Executes a command in a service container without starting any services that the target service depends on or links to. Useful when you only need the target service container.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_10
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run --no-deps web python manage.py shell
+```
+
+----------------------------------------
+
+TITLE: Example docker compose pull command and output
+DESCRIPTION: Shows the command `docker compose pull db` being executed and the resulting console output indicating the image pull progress for the 'db' service defined in the compose file.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_pull.md#_snippet_1
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose pull db
+[+] Running 1/15
+ ‸ db Pulling                                                             12.4s
+   ‽ 45b42c59be33 Already exists                                           0.0s
+   ‹ 40adec129f1a Downloading  3.374MB/4.178MB                             9.3s
+   ‹ b4c431d00c78 Download complete                                        9.3s
+   ‹ 2696974e2815 Download complete                                        9.3s
+   ‹ 564b77596399 Downloading  5.622MB/7.965MB                             9.3s
+   ‹ 5044045cf6f2 Downloading  216.7kB/391.1kB                             9.3s
+   ‹ d736e67e6ac3 Waiting                                                  9.3s
+   ‹ 390c1c9a5ae4 Waiting                                                  9.3s
+   ‹ c0e62f172284 Waiting                                                  9.3s
+   ‹ ebcdc659c5bf Waiting                                                  9.3s
+   ‹ 29be22cb3acc Waiting                                                  9.3s
+   ‹ f63c47038e66 Waiting                                                  9.3s
+   ‹ 77a0c198cde5 Waiting                                                  9.3s
+   ‹ c8752d5b785c Waiting                                                  9.3s
+```
+
+----------------------------------------
+
+TITLE: Filter by Running Status (--status) - Docker Compose
+DESCRIPTION: Lists containers and filters the output to show only those with a 'running' status using the --status flag.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_6
+
+LANGUAGE: console
+CODE:
+```
+docker compose ps --status=running
+```
+
+----------------------------------------
+
+TITLE: Running a command with linked services
+DESCRIPTION: Executes a command in a service container. If the service is configured with links, this command will first check if linked services are running and start them if necessary before executing the command.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_run.md#_snippet_9
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose run db psql -h db -U docker
+```
+
+----------------------------------------
+
+TITLE: Specifying a Compose File Path (Console)
+DESCRIPTION: Illustrates using the `-f` flag with a full or relative path to a Compose file that is not in the current working directory. This example pulls the `db` service image using a file located at `~/sandbox/rails/compose.yaml`.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose.md#_snippet_4
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose -f ~/sandbox/rails/compose.yaml pull db
+```
+
+----------------------------------------
+
+TITLE: Format Output as JSON (--format json) - Docker Compose
+DESCRIPTION: Lists containers and formats the output as a JSON array using the --format flag, useful for programmatic processing.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_4
+
+LANGUAGE: console
+CODE:
+```
+docker compose ps --format json
+```
+
+----------------------------------------
+
+TITLE: Pretty-Print JSON Output with jq - Docker Compose
+DESCRIPTION: Lists containers in JSON format and pipes the output to the jq utility for pretty-printing, making it more readable.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_5
+
+LANGUAGE: console
+CODE:
+```
+docker compose ps --format json | jq .
+```
+
+----------------------------------------
+
+TITLE: Using Docker Compose Dry Run for Up Command
+DESCRIPTION: This snippet demonstrates how to use the `--dry-run` flag with the `docker compose up` command. It shows the command itself, which includes the `--build` and `-d` flags, and the expected output indicating the steps Compose would perform without making actual changes to the stack.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose.md#_snippet_6
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose --dry-run up --build -d
+```
+
+----------------------------------------
+
+TITLE: Filter by Exited Status (--status) - Docker Compose
+DESCRIPTION: Lists containers and filters the output to show only those with an 'exited' status using the --status flag.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_7
+
+LANGUAGE: console
+CODE:
+```
+docker compose ps --status=exited
+```
+
+----------------------------------------
+
+TITLE: Filter by Running Status (--filter) - Docker Compose
+DESCRIPTION: Lists containers and filters the output to show only those with a 'running' status using the --filter flag, which is an alternative to --status.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_ps.md#_snippet_8
+
+LANGUAGE: console
+CODE:
+```
+docker compose ps --filter status=running
+```
+
+----------------------------------------
+
+TITLE: Example: Kill containers with SIGINT
+DESCRIPTION: Demonstrates how to use the `docker compose kill` command to send a specific signal (`SIGINT`) instead of the default `SIGKILL`.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_kill.md#_snippet_0
+
+LANGUAGE: console
+CODE:
+```
+$ docker compose kill -s SIGINT
+```
+
+----------------------------------------
+
+TITLE: Example compose.yaml for docker compose pull
+DESCRIPTION: Defines two services, 'db' using a 'postgres' image and 'web' which is built from context and depends on 'db'. This file is used as context for the `docker compose pull` command example.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_pull.md#_snippet_0
+
+LANGUAGE: yaml
+CODE:
+```
+services:
+  db:
+    image: postgres
+  web:
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/myapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+```
+
+----------------------------------------
+
+TITLE: Example Docker Compose Configuration for Push
+DESCRIPTION: Illustrates a basic `docker-compose.yaml` configuration defining two services with images targeting a local registry and Docker Hub, suitable for use with `docker compose push`.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_push.md#_snippet_0
+
+LANGUAGE: yaml
+CODE:
+```
+services:
+  service1:
+    build: .
+    image: localhost:5000/yourimage  ## goes to local registry
+
+  service2:
+    build: .
+    image: your-dockerid/yourimage  ## goes to your repository on Docker Hub
+```
+
+----------------------------------------
+
+TITLE: Service Dependency on Provider-Managed Service (YAML)
+DESCRIPTION: Shows how a standard Docker Compose service (`app`) can declare a dependency on a service (`database`) managed by an external provider using the `depends_on` attribute, enabling environment variable injection.
+SOURCE: https://github.com/docker/compose/blob/main/docs/extension.md#_snippet_3
+
+LANGUAGE: yaml
+CODE:
+```
+services:
+  app:
+    image: myapp 
+    depends_on:
+       - database
+
+  database:
+    provider:
+      type: awesomecloud
+```
+
+----------------------------------------
+
+TITLE: Get Docker Version (Shell)
+DESCRIPTION: Provides the version information for the Docker client and server. This is often required when reporting issues to help diagnose compatibility problems.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_0
+
+LANGUAGE: shell
+CODE:
+```
+docker version
+```
+
+----------------------------------------
+
+TITLE: Show Current Docker Context (Shell)
+DESCRIPTION: Displays the name of the currently active Docker context. This helps identify which Docker daemon the client is interacting with, which is useful for debugging.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_1
+
+LANGUAGE: shell
+CODE:
+```
+docker context show
+```
+
+----------------------------------------
+
+TITLE: Get Docker System Information (Shell)
+DESCRIPTION: Provides detailed system-wide information about the Docker installation, including storage drivers, kernel version, and resource usage. Essential for diagnosing environment-specific issues.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_2
+
+LANGUAGE: shell
+CODE:
+```
+docker info
+```
+
+----------------------------------------
+
+TITLE: Provider Setting Environment Variable (JSON)
+DESCRIPTION: Example of a `setenv` JSON message sent by a provider to instruct Compose to inject an environment variable (`URL`) into services that depend on the provider-managed service, automatically prefixed with the service name.
+SOURCE: https://github.com/docker/compose/blob/main/docs/extension.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{"type": "setenv", "message": "URL=https://awesomecloud.com/db:1234"}
+```
+
+----------------------------------------
+
+TITLE: JSON Output Format for Docker Compose Events
+DESCRIPTION: This JSON object illustrates the structure of the output when the 'docker compose events' command is used with the '--json' flag. Each event is printed as a single line JSON object in this format.
+SOURCE: https://github.com/docker/compose/blob/main/docs/reference/compose_events.md#_snippet_0
+
+LANGUAGE: JSON
+CODE:
+```
+{
+    "time": "2015-11-20T18:01:03.615550",
+    "type": "container",
+    "action": "create",
+    "id": "213cf7...5fc39a",
+    "service": "web",
+    "attributes": {
+      "name": "application_web_1",
+      "image": "alpine:edge"
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Interactively Rebase Git Commits
+DESCRIPTION: Starts an interactive rebase session, allowing commits to be squashed, reordered, edited, or dropped. This is used to organize commits into logical units of work before submitting a pull request.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_6
+
+LANGUAGE: Git
+CODE:
+```
+git rebase -i
+```
+
+----------------------------------------
+
+TITLE: Defining a Service with External Provider (YAML)
+DESCRIPTION: Configures a Docker Compose service (`database`) to be managed by an external provider specified by `provider.type`. Additional provider-specific options are passed via `provider.options`.
+SOURCE: https://github.com/docker/compose/blob/main/docs/extension.md#_snippet_0
+
+LANGUAGE: yaml
+CODE:
+```
+  database:
+    provider:
+      type: awesomecloud
+      options:
+        type: mysql
+        size: 256
+```
+
+----------------------------------------
+
+TITLE: Build and Run All End-to-End Tests (make)
+DESCRIPTION: First builds the Docker Compose CLI plugin, then executes both the CLI plugin and standalone end-to-end test suites using the make command. This requires a local Docker Engine to be running.
+SOURCE: https://github.com/docker/compose/blob/main/BUILDING.md#_snippet_3
+
+LANGUAGE: console
+CODE:
+```
+make build-and-e2e
+```
+
+----------------------------------------
+
+TITLE: Rebase Feature Branch onto Master
+DESCRIPTION: Updates a feature branch by reapplying its commits on top of the latest state of the master branch. This is the recommended method for keeping a pull request up-to-date and maintaining a clean history, preferred over merging master into the feature branch.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_4
+
+LANGUAGE: Git
+CODE:
+```
+rebase master
+```
+
+----------------------------------------
+
+TITLE: Build and Run Standalone End-to-End Tests (make)
+DESCRIPTION: First builds the Docker Compose CLI plugin, then executes only the end-to-end tests for the standalone CLI using the make command. This requires a local Docker Engine to be running.
+SOURCE: https://github.com/docker/compose/blob/main/BUILDING.md#_snippet_7
+
+LANGUAGE: console
+CODE:
+```
+make build-and-e2e-compose-standalone
+```
+
+----------------------------------------
+
+TITLE: Build and Run CLI Plugin End-to-End Tests (make)
+DESCRIPTION: First builds the Docker Compose CLI plugin, then executes only the end-to-end tests specifically for the CLI plugin using the make command. This requires a local Docker Engine to be running.
+SOURCE: https://github.com/docker/compose/blob/main/BUILDING.md#_snippet_5
+
+LANGUAGE: console
+CODE:
+```
+make build-and-e2e-compose
+```
+
+----------------------------------------
+
+TITLE: Build Docker Compose CLI Plugin (make)
+DESCRIPTION: Builds the Docker Compose CLI plugin for the host machine using the make command. The resulting binary is located in the `./bin/build` directory.
+SOURCE: https://github.com/docker/compose/blob/main/BUILDING.md#_snippet_0
+
+LANGUAGE: console
+CODE:
+```
+make
+```
+
+----------------------------------------
+
+TITLE: Run All End-to-End Tests (make)
+DESCRIPTION: Executes both the CLI plugin and standalone end-to-end test suites using the make command. This requires a local Docker Engine to be running.
+SOURCE: https://github.com/docker/compose/blob/main/BUILDING.md#_snippet_2
+
+LANGUAGE: console
+CODE:
+```
+make e2e
+```
+
+----------------------------------------
+
+TITLE: Run CLI Plugin End-to-End Tests (make)
+DESCRIPTION: Executes only the end-to-end tests specifically for the Docker Compose CLI plugin using the make command. This requires a local Docker Engine to be running.
+SOURCE: https://github.com/docker/compose/blob/main/BUILDING.md#_snippet_4
+
+LANGUAGE: console
+CODE:
+```
+make e2e-compose
+```
+
+----------------------------------------
+
+TITLE: Run Standalone End-to-End Tests (make)
+DESCRIPTION: Executes only the end-to-end tests for the standalone Docker Compose CLI using the make command. This requires a local Docker Engine to be running.
+SOURCE: https://github.com/docker/compose/blob/main/BUILDING.md#_snippet_6
+
+LANGUAGE: console
+CODE:
+```
+make e2e-compose-standalone
+```
+
+----------------------------------------
+
+TITLE: Run Unit Tests (make)
+DESCRIPTION: Executes all unit tests defined for the Docker Compose CLI project using the make command.
+SOURCE: https://github.com/docker/compose/blob/main/BUILDING.md#_snippet_1
+
+LANGUAGE: console
+CODE:
+```
+make test
+```
+
+----------------------------------------
+
+TITLE: Force Push Git Branch
+DESCRIPTION: Forces the push of a branch to the remote repository, overwriting the remote branch's history. This is typically used after performing an interactive rebase (`git rebase -i`) to update the remote branch with the new, squashed history.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_7
+
+LANGUAGE: Git
+CODE:
+```
+git push -f
+```
+
+----------------------------------------
+
+TITLE: Format Go Code with gofmt
+DESCRIPTION: Applies standard Go formatting to a specified file, simplifying imports and writing the changes back to the file. This ensures consistent code style across the project.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_3
+
+LANGUAGE: Go
+CODE:
+```
+gofmt -s -w file.go
+```
+
+----------------------------------------
+
+TITLE: Adding Signed-off-by Line to Git Commit
+DESCRIPTION: To certify that you have the right to submit a patch, you must add a 'Signed-off-by' line to your Git commit message. This line includes your real name and email address.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_8
+
+LANGUAGE: Git Commit Format
+CODE:
+```
+Signed-off-by: Joe Smith <joe.smith@email.com>
+```
+
+----------------------------------------
+
+TITLE: Signing Git Commit Automatically
+DESCRIPTION: If your user.name and user.email Git configurations are set, you can automatically add the 'Signed-off-by' line to your commit message by using the '-s' flag with the git commit command.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_9
+
+LANGUAGE: Git
+CODE:
+```
+git commit -s
+```
+
+----------------------------------------
+
+TITLE: Merge Master into Feature Branch
+DESCRIPTION: Merges the master branch into the current feature branch. The document advises against this method for updating a feature branch in favor of using `rebase master` to maintain a cleaner commit history.
+SOURCE: https://github.com/docker/compose/blob/main/CONTRIBUTING.md#_snippet_5
+
+LANGUAGE: Git
+CODE:
+```
+merge master
+```
+
+----------------------------------------
+
+TITLE: Calling Provider Command (Console)
+DESCRIPTION: Illustrates the command executed by Docker Compose to delegate the `up` lifecycle of a service (`database`) to the configured external provider (`awesomecloud`), passing project name and provider options as command-line flags.
+SOURCE: https://github.com/docker/compose/blob/main/docs/extension.md#_snippet_1
+
+LANGUAGE: console
+CODE:
+```
+awesomecloud compose --project-name <NAME> up --type=mysql --size=256 "database"
+```
+
+----------------------------------------
+
+TITLE: Provider-to-Compose JSON Message Format (JSON)
+DESCRIPTION: Defines the standard JSON format used by external providers to communicate status updates, errors, environment variables, or debug information back to the Docker Compose CLI during the service lifecycle.
+SOURCE: https://github.com/docker/compose/blob/main/docs/extension.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{ "type": "info", "message": "preparing mysql ..." }
+```

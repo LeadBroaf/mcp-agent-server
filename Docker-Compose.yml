@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  mcp-server:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgres://user:password@postgres:5432/mcp
+      - N8N_URL=http://n8n:5678
+      - N8N_API_KEY=your-n8n-api-key
+      - NODE_ENV=production
+      # Add SaaS/monetization env vars here (e.g., STRIPE_KEY, PLAN_ID, etc.)
+    volumes:
+      - ./memory:/app/memory
+      - ./docs:/app/docs
+    depends_on:
+      - postgres
+      - n8n
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mcp
+    ports:
+      - "5433:5432"
+
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin

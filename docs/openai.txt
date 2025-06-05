@@ -1,0 +1,1344 @@
+TITLE: Configuring Request Retries in JavaScript
+DESCRIPTION: Shows how to configure the maximum number of retries for API requests. It provides examples for setting the `maxRetries` option globally when initializing the client and overriding it for individual requests.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_9
+
+LANGUAGE: JavaScript
+CODE:
+```
+// Configure the default for all requests:
+const client = new OpenAI({
+  maxRetries: 0, // default is 2
+});
+
+// Or, configure per-request:
+await client.chat.completions.create({ messages: [{ role: 'user', content: 'How can I get the name of the current day in JavaScript?' }], model: 'gpt-4o' }, {
+  maxRetries: 5,
+});
+```
+
+----------------------------------------
+
+TITLE: Installing OpenAI Library with npm
+DESCRIPTION: Installs the OpenAI Node.js library using the npm package manager. This is the standard installation method for Node.js projects.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+npm install openai
+```
+
+----------------------------------------
+
+TITLE: Handling OpenAI API Errors in TypeScript
+DESCRIPTION: Demonstrates how to catch and handle `OpenAI.APIError` when making requests using the OpenAI Node.js SDK. It shows how to access error properties like `request_id`, `status`, `name`, and `headers`.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_8
+
+LANGUAGE: TypeScript
+CODE:
+```
+async function main() {
+  const job = await client.fineTuning.jobs
+    .create({ model: 'gpt-4o', training_file: 'file-abc123' })
+    .catch(async (err) => {
+      if (err instanceof OpenAI.APIError) {
+        console.log(err.request_id);
+        console.log(err.status); // 400
+        console.log(err.name); // BadRequestError
+        console.log(err.headers); // {server: 'nginx', ...}
+      } else {
+        throw err;
+      }
+    });
+}
+
+main();
+```
+
+----------------------------------------
+
+TITLE: Generating Text with OpenAI Chat Completions API (TypeScript)
+DESCRIPTION: Demonstrates using the older but still supported Chat Completions API to generate text. It initializes the client, provides a list of messages with roles, and logs the content of the first choice's message. Requires the OPENAI_API_KEY environment variable.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_5
+
+LANGUAGE: ts
+CODE:
+```
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted
+});
+
+const completion = await client.chat.completions.create({
+  model: 'gpt-4o',
+  messages: [
+    { role: 'developer', content: 'Talk like a pirate.' },
+    { role: 'user', content: 'Are semicolons optional in JavaScript?' },
+  ],
+});
+
+console.log(completion.choices[0].message.content);
+```
+
+----------------------------------------
+
+TITLE: Streaming Responses from OpenAI (TypeScript)
+DESCRIPTION: Illustrates how to stream responses from the OpenAI API using Server Sent Events (SSE). It calls the responses.create method with stream: true and iterates over the incoming events.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_6
+
+LANGUAGE: ts
+CODE:
+```
+import OpenAI from 'openai';
+
+const client = new OpenAI();
+
+const stream = await client.responses.create({
+  model: 'gpt-4o',
+  input: 'Say "Sheep sleep deep" ten times fast!',
+  stream: true,
+});
+
+for await (const event of stream) {
+  console.log(event);
+}
+```
+
+----------------------------------------
+
+TITLE: Uploading Files to OpenAI (TypeScript)
+DESCRIPTION: Shows various ways to upload files using the client.files.create method. It covers using fs.createReadStream, the web File API, a fetch Response, and the library's toFile helper for Buffer or Uint8Array. Requires appropriate file objects or streams.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_7
+
+LANGUAGE: ts
+CODE:
+```
+import fs from 'fs';
+import fetch from 'node-fetch';
+import OpenAI, { toFile } from 'openai';
+
+const client = new OpenAI();
+
+// If you have access to Node `fs` we recommend using `fs.createReadStream()`:
+await client.files.create({ file: fs.createReadStream('input.jsonl'), purpose: 'fine-tune' });
+
+// Or if you have the web `File` API you can pass a `File` instance:
+await client.files.create({ file: new File(['my bytes'], 'input.jsonl'), purpose: 'fine-tune' });
+
+// You can also pass a `fetch` `Response`:
+await client.files.create({ file: await fetch('https://somesite/input.jsonl'), purpose: 'fine-tune' });
+
+// Finally, if none of the above are convenient, you can use our `toFile` helper:
+await client.files.create({
+  file: await toFile(Buffer.from('my bytes'), 'input.jsonl'),
+  purpose: 'fine-tune',
+});
+await client.files.create({
+  file: await toFile(new Uint8Array([0, 1, 2]), 'input.jsonl'),
+  purpose: 'fine-tune',
+});
+```
+
+----------------------------------------
+
+TITLE: Integrating Zod for Schema Validation in OpenAI Function Calls (TypeScript)
+DESCRIPTION: Illustrates integrating the 'zod' library with the OpenAI Node.js SDK to validate function call arguments and generate the JSON schema for the tool parameters. The example uses `runTools`, defines a tool with `parse` (using `ZodObject.parse`) and `parameters` (using `zodToJsonSchema`), creates a Zod schema, implements the corresponding function, and awaits the final content.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_15
+
+LANGUAGE: typescript
+CODE:
+```
+```ts
+import OpenAI from 'openai';
+import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
+
+const client = new OpenAI();
+
+async function main() {
+  const runner = client.chat.completions
+    .runTools({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: "How's the weather this week in Los Angeles?" }],
+      tools: [
+        {
+          type: 'function',
+          function: {
+            function: getWeather,
+            parse: GetWeatherParameters.parse,
+            parameters: zodToJsonSchema(GetWeatherParameters),
+          },
+        },
+      ],
+    })
+    .on('message', (message) => console.log(message));
+
+  const finalContent = await runner.finalContent();
+  console.log('Final content:', finalContent);
+}
+
+const GetWeatherParameters = z.object({
+  location: z.enum(['Boston', 'New York City', 'Los Angeles', 'San Francisco']),
+});
+
+async function getWeather(args: z.infer<typeof GetWeatherParameters>) {
+  const { location } = args;
+  // … do lookup …
+  return { temperature, precipitation };
+}
+
+main();
+```
+```
+
+----------------------------------------
+
+TITLE: Creating and Running Thread with Streaming in TypeScript
+DESCRIPTION: Creates a new thread and runs it, streaming the results as they become available. This method provides a stream interface for the run.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_27
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.threads.createAndRunStream(body, options?)
+```
+
+----------------------------------------
+
+TITLE: Auto-Paginating List Results with for await...of in TypeScript
+DESCRIPTION: Demonstrates how to use the `for await...of` syntax to automatically iterate through all items across multiple pages returned by a paginated list method, simplifying the process of fetching large datasets.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_13
+
+LANGUAGE: TypeScript
+CODE:
+```
+async function fetchAllFineTuningJobs(params) {
+  const allFineTuningJobs = [];
+  // Automatically fetches more pages as needed.
+  for await (const fineTuningJob of client.fineTuning.jobs.list({ limit: 20 })) {
+    allFineTuningJobs.push(fineTuningJob);
+  }
+  return allFineTuningJobs;
+}
+```
+
+----------------------------------------
+
+TITLE: Initiating Streaming Chat Completions in TypeScript
+DESCRIPTION: This snippet shows the function signature for `openai.chat.completions.stream()`. This method returns a `ChatCompletionStreamingRunner` object, which facilitates handling streaming responses by emitting events and providing an async iterator. An alternative method, `openai.chat.completions.create({ stream: true, ... })`, returns a simpler async iterable of chunks and uses less memory.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_12
+
+LANGUAGE: typescript
+CODE:
+```
+openai.chat.completions.stream({ stream?: false, … }, options?): ChatCompletionStreamingRunner
+```
+
+----------------------------------------
+
+TITLE: Creating Thread (POST /threads) in TypeScript
+DESCRIPTION: Creates a new thread resource. This method sends a POST request to the /threads endpoint, optionally including initial messages or metadata.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_21
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.threads.create({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Handling Streaming Tool Call Events in OpenAI Assistant API - TypeScript
+DESCRIPTION: Covers the event pattern for subscribing to tool call lifecycle events (creation, delta, completion) when streaming runs via the Assistant API. Code listeners facilitate programmatic reactions to external tool invocations initiated by assistant logic. Expects distinctly typed ToolCall, RunStepDelta, and snapshot payloads for each event.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_9
+
+LANGUAGE: typescript
+CODE:
+```
+.on('toolCallCreated', (toolCall: ToolCall) => ...)
+.on('toolCallDelta', (delta: RunStepDelta, snapshot: ToolCall) => ...)
+.on('toolCallDone', (toolCall: ToolCall) => ...)
+```
+
+----------------------------------------
+
+TITLE: Creating Assistant (POST /assistants) in TypeScript
+DESCRIPTION: Creates a new assistant resource via the OpenAI API. This function maps to a POST request to the /assistants endpoint and requires assistant configuration parameters.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_16
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.assistants.create({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Retrieve File Content using OpenAI Node.js Client (String)
+DESCRIPTION: Retrieves the content of a specific file by its ID, returning the content as a string. Requires the fileId as a parameter.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_5
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.files.retrieveContent(fileId)
+```
+
+----------------------------------------
+
+TITLE: Create Audio Speech using OpenAI Node.js Client
+DESCRIPTION: Generates audio from text using a text-to-speech model. Requires various parameters including the text and voice. Returns a Response object containing the audio stream.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_12
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.audio.speech.create({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Retrieve Run using OpenAI Node.js Client
+DESCRIPTION: Retrieves a specific run by its thread ID and run ID. This method fetches the current state of a run. Returns a Run object.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_29
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.threads.runs.retrieve(threadId, runId)
+```
+
+----------------------------------------
+
+TITLE: Parsing Function Tool Calls with Zod Schemas in OpenAI Chat Completions - TypeScript
+DESCRIPTION: Shows how to define complex input and function tool schemas using Zod, and apply the zodFunction helper to enable type-safe auto-parsing of function tool call arguments in OpenAI's chat completions. Requires OpenAI Node.js SDK and Zod. Key parameters include elaborate Zod schemas for tables, columns, operators, and the overall query structure mapping to a database-like request. Outputs are type-checked, parsed arguments for function tool calls, along with example access to parsed fields. All tool schemas must be marked as strict as required by the parse() API constraint.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_1
+
+LANGUAGE: typescript
+CODE:
+```
+import { zodFunction } from 'openai/helpers/zod';
+import OpenAI from 'openai/index';
+import { z } from 'zod';
+
+const Table = z.enum(['orders', 'customers', 'products']);
+
+const Column = z.enum([
+  'id',
+  'status',
+  'expected_delivery_date',
+  'delivered_at',
+  'shipped_at',
+  'ordered_at',
+  'canceled_at',
+]);
+
+const Operator = z.enum(['=', '>', '<', '<=', '>=', '!=']);
+
+const OrderBy = z.enum(['asc', 'desc']);
+
+const DynamicValue = z.object({
+  column_name: z.string(),
+});
+
+const Condition = z.object({
+  column: z.string(),
+  operator: Operator,
+  value: z.union([z.string(), z.number(), DynamicValue]),
+});
+
+const Query = z.object({
+  table_name: Table,
+  columns: z.array(Column),
+  conditions: z.array(Condition),
+  order_by: OrderBy,
+});
+
+const client = new OpenAI();
+const completion = await client.beta.chat.completions.parse({
+  model: 'gpt-4o-2024-08-06',
+  messages: [
+    {
+      role: 'system',
+      content:
+        'You are a helpful assistant. The current date is August 6, 2024. You help users query for the data they are looking for by calling the query function.',
+    },
+    {
+      role: 'user',
+      content: 'look up all my orders in november of last year that were fulfilled but not delivered on time',
+    },
+  ],
+  tools: [zodFunction({ name: 'query', parameters: Query })],
+});
+console.dir(completion, { depth: 10 });
+
+const toolCall = completion.choices[0]?.message.tool_calls?.[0];
+if (toolCall) {
+  const args = toolCall.function.parsed_arguments as z.infer<typeof Query>;
+  console.log(args);
+  console.log(args.table_name);
+}
+
+main();
+```
+
+----------------------------------------
+
+TITLE: Retrieving Thread (GET /threads/{thread_id}) in TypeScript
+DESCRIPTION: Retrieves the details of a specific thread by its ID. This function performs a GET request to the /threads/{thread_id} endpoint.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_22
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.threads.retrieve(threadId)
+```
+
+----------------------------------------
+
+TITLE: Create File using OpenAI Node.js Client
+DESCRIPTION: Initiates the upload of a file to the OpenAI platform. Requires various parameters for file content and purpose. Returns a FileObject representing the uploaded file.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.files.create({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Create Audio Transcription using OpenAI Node.js Client
+DESCRIPTION: Transcribes audio into text. Requires various parameters including the audio file. Returns a TranscriptionCreateResponse containing the transcribed text.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_10
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.audio.transcriptions.create({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Implementing Automated Function Calls with runTools in TypeScript
+DESCRIPTION: This example demonstrates using the `openai.beta.chat.completions.runTools` helper in TypeScript to automate function calls with the OpenAI API. It initializes an OpenAI client, defines asynchronous functions (`getCurrentLocation`, `getWeather`), and configures `runTools` with the model, messages, and tools (including function definitions and an optional parser). The helper handles the loop of calling the API, executing the specified JavaScript functions based on the model's requests, and sending back results until a final response is generated. It uses an event listener (`.on('message', ...)` to log intermediate messages and retrieves the final content using `await runner.finalContent()`.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_13
+
+LANGUAGE: typescript
+CODE:
+```
+import OpenAI from 'openai';
+
+const client = new OpenAI();
+
+async function main() {
+  const runner = client.beta.chat.completions
+    .runTools({
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: 'How is the weather this week?' }],
+      tools: [
+        {
+          type: 'function',
+          function: {
+            function: getCurrentLocation,
+            parameters: { type: 'object', properties: {} },
+          },
+        },
+        {
+          type: 'function',
+          function: {
+            function: getWeather,
+            parse: JSON.parse, // or use a validation library like zod for typesafe parsing.
+            parameters: {
+              type: 'object',
+              properties: {
+                location: { type: 'string' },
+              },
+            },
+          },
+        },
+      ],
+    })
+    .on('message', (message) => console.log(message));
+
+  const finalContent = await runner.finalContent();
+  console.log();
+  console.log('Final content:', finalContent);
+}
+
+async function getCurrentLocation() {
+  return 'Boston'; // Simulate lookup
+}
+
+async function getWeather(args: { location: string }) {
+  const { location } = args;
+  // … do lookup …
+  return { temperature, precipitation };
+}
+
+main();
+
+// {role: "user",      content: "How's the weather this week?"}
+// {role: "assistant", tool_calls: [{type: "function", function: {name: "getCurrentLocation", arguments: "{}"}, id: "123"}
+// {role: "tool",      name: "getCurrentLocation", content: "Boston", tool_call_id: "123"}
+// {role: "assistant", tool_calls: [{type: "function", function: {name: "getWeather", arguments: '{"location": "Boston"}'}, id: "1234"}]}
+// {role: "tool",      name: "getWeather", content: '{"temperature": "50degF", "preciptation": "high"}', tool_call_id: "1234"}
+// {role: "assistant", content: "It's looking cold and rainy - you might want to wear a jacket!"}
+//
+// Final content: "It's looking cold and rainy - you might want to wear a jacket!"
+```
+
+----------------------------------------
+
+TITLE: Create Moderation using OpenAI Node.js Client
+DESCRIPTION: Checks if content violates OpenAI's usage policies. Requires text or image input. Returns a ModerationCreateResponse indicating categories and scores.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_13
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.moderations.create({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Generate Image using OpenAI Node.js Client
+DESCRIPTION: Creates a new image from a text prompt. Requires various parameters including the prompt. Returns an ImagesResponse containing the generated image.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_9
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.images.generate({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Retrieve File using OpenAI Node.js Client
+DESCRIPTION: Fetches the details of a specific file by its ID. Requires the fileId as a parameter. Returns a FileObject containing the file's metadata.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_1
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.files.retrieve(fileId)
+```
+
+----------------------------------------
+
+TITLE: Updating Thread (POST /threads/{thread_id}) in TypeScript
+DESCRIPTION: Updates an existing thread resource identified by its ID. This method sends a POST request to the /threads/{thread_id} endpoint with the updated parameters.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_23
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.threads.update(threadId, { ...params })
+```
+
+----------------------------------------
+
+TITLE: List Files using OpenAI Node.js Client
+DESCRIPTION: Retrieves a list of all files uploaded to the OpenAI platform. Accepts optional parameters for filtering. Returns a paginated list of FileObject instances.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_2
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.files.list({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Listing Assistants (GET /assistants) in TypeScript
+DESCRIPTION: Lists assistants, potentially filtered by parameters. This method corresponds to a GET request to the /assistants endpoint.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_19
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.assistants.list({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Updating Assistant (POST /assistants/{assistant_id}) in TypeScript
+DESCRIPTION: Updates an existing assistant resource identified by its ID. This function sends a POST request to the /assistants/{assistant_id} endpoint with the updated parameters.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_18
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.assistants.update(assistantId, { ...params })
+```
+
+----------------------------------------
+
+TITLE: Listing OpenAI Asynchronous Operation Polling Helpers in TypeScript
+DESCRIPTION: Lists the polling helper methods available in the OpenAI Node.js SDK. These methods, ending in `_AndPoll`, handle asynchronous operations by polling the API until a terminal state is reached. They apply to creating threads and runs, submitting tool outputs, and managing vector store files and batches. The polling frequency can be adjusted via `pollIntervalMs`.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_16
+
+LANGUAGE: typescript
+CODE:
+```
+```ts
+client.beta.threads.createAndRunPoll(...)
+client.beta.threads.runs.createAndPoll((...)
+client.beta.threads.runs.submitToolOutputsAndPoll((...)
+client.beta.vectorStores.files.uploadAndPoll((...)
+client.beta.vectorStores.files.createAndPoll((...)
+client.beta.vectorStores.fileBatches.createAndPoll((...)
+client.beta.vectorStores.fileBatches.uploadAndPoll((...)
+```
+```
+
+----------------------------------------
+
+TITLE: Edit Image using OpenAI Node.js Client
+DESCRIPTION: Edits an image based on a text prompt and an optional mask. Requires various parameters including the image file and prompt. Returns an ImagesResponse containing the edited image.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_8
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.images.edit({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Initializing AzureOpenAI with Azure AD Token Provider (TypeScript)
+DESCRIPTION: Demonstrates how to initialize the `AzureOpenAI` client using an Azure AD token provider obtained from `@azure/identity`. It shows setting up credentials, defining the scope, getting the token provider, and then creating the client instance with the provider and API version. Finally, it shows making a chat completion request.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_16
+
+LANGUAGE: typescript
+CODE:
+```
+import { AzureOpenAI } from 'openai';
+import { getBearerTokenProvider, DefaultAzureCredential } from '@azure/identity';
+
+const credential = new DefaultAzureCredential();
+const scope = 'https://cognitiveservices.azure.com/.default';
+const azureADTokenProvider = getBearerTokenProvider(credential, scope);
+
+const openai = new AzureOpenAI({ azureADTokenProvider, apiVersion: "<The API version, e.g. 2024-10-01-preview>" });
+
+const result = await openai.chat.completions.create({
+  model: 'gpt-4o',
+  messages: [{ role: 'user', content: 'Say hello!' }],
+});
+
+console.log(result.choices[0]!.message?.content);
+```
+
+----------------------------------------
+
+TITLE: Parsing Structured Chat Completion Responses with Zod Schema in OpenAI SDK - TypeScript
+DESCRIPTION: Demonstrates how to define data validation schemas using Zod and utilize the zodResponseFormat helper to auto-parse structured JSON responses from OpenAI's chat completions API. Requires the 'openai' Node.js SDK and 'zod' for schema definitions. Inputs include a Zod object describing the expected result (here, a math problem solution) and standard chat completion parameters. Outputs a ParsedChatCompletion object with type-safe parsed content, which is accessed through the returned data structure. Limitations include dependency on proper schema definitions and error-throwing if the finish_reason is 'length' or 'content_filter'.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+import { zodResponseFormat } from 'openai/helpers/zod';
+import OpenAI from 'openai/index';
+import { z } from 'zod';
+
+const Step = z.object({
+  explanation: z.string(),
+  output: z.string(),
+});
+
+const MathResponse = z.object({
+  steps: z.array(Step),
+  final_answer: z.string(),
+});
+
+const client = new OpenAI();
+
+const completion = await client.beta.chat.completions.parse({
+  model: 'gpt-4o-2024-08-06',
+  messages: [
+    { role: 'system', content: 'You are a helpful math tutor.' },
+    { role: 'user', content: 'solve 8x + 31 = 2' },
+  ],
+  response_format: zodResponseFormat(MathResponse, 'math_response'),
+});
+
+console.dir(completion, { depth: 5 });
+
+const message = completion.choices[0]?.message;
+if (message?.parsed) {
+  console.log(message.parsed.steps);
+  console.log(`answer: ${message.parsed.final_answer}`);
+}
+```
+
+----------------------------------------
+
+TITLE: Create Audio Translation using OpenAI Node.js Client
+DESCRIPTION: Translates audio into English text. Requires various parameters including the audio file. Returns a TranslationCreateResponse containing the translated text.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_11
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.audio.translations.create({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Stream Run Progress using OpenAI Node.js Client
+DESCRIPTION: Streams the progress and events of an existing run. Requires thread ID, body parameters (potentially for re-submitting tool outputs), and optional streaming options. Returns an AssistantStream object.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_37
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.threads.runs.stream(threadId, body, options?)
+```
+
+----------------------------------------
+
+TITLE: Importing Node and Web Shim Overrides (ECMAScript Imports, Markdown/JavaScript)
+DESCRIPTION: This snippet shows how users can manually import shims for specific environments (Node or web) in the openai-node SDK. By importing either the 'openai/shims/node' or 'openai/shims/web' modules, the developer can override the environment auto-detection to ensure the correct fetch shim (or other runtime behaviors) is used. This approach is especially useful in environments where automatic detection via conditional exports fails (such as when using incompatible TypeScript module resolution strategies). No other dependencies are required, but the openai-node package must be installed. The imports do not take parameters and only affect global runtime shims. Output is the installation of the correct environment shim for subsequent SDK usage.
+SOURCE: https://github.com/openai/openai-node/blob/master/src/_shims/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+import 'openai/shims/node'
+```
+
+LANGUAGE: javascript
+CODE:
+```
+import 'openai/shims/web'
+```
+
+----------------------------------------
+
+TITLE: Wait for File Processing using OpenAI Node.js Client
+DESCRIPTION: Waits for a file to finish processing on the OpenAI platform. Requires the file ID and optional polling parameters. Returns a Promise resolving to the processed FileObject.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_6
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.files.waitForProcessing(id, { pollInterval = 5000, maxWait = 30 _ 60 _ 1000 })
+```
+
+----------------------------------------
+
+TITLE: Subscribing to Streaming Assistant Run Events in OpenAI Node SDK - TypeScript
+DESCRIPTION: Illustrates usage of the OpenAI SDK's assistant streaming API to handle real-time events during a run, such as text output, tool call events, and code interpreter outputs. Utilizes event-driven programming patterns, enabling subscription to both high-level and delta events for granular feedback. Relies on the beta.threads.runs.stream method with a thread and assistant id. Outputs are handled directly via process.stdout.write, demonstrating custom real-time handling for each event type.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_2
+
+LANGUAGE: typescript
+CODE:
+```
+const run = openai.beta.threads.runs
+  .stream(thread.id, { assistant_id: assistant.id })
+  .on('textCreated', (text) => process.stdout.write('\nassistant > '))
+  .on('textDelta', (textDelta, snapshot) => process.stdout.write(textDelta.value))
+  .on('toolCallCreated', (toolCall) => process.stdout.write(`\nassistant > ${toolCall.type}\n\n`))
+  .on('toolCallDelta', (toolCallDelta, snapshot) => {
+    if (toolCallDelta.type === 'code_interpreter') {
+      if (toolCallDelta.code_interpreter.input) {
+        process.stdout.write(toolCallDelta.code_interpreter.input);
+      }
+      if (toolCallDelta.code_interpreter.outputs) {
+        process.stdout.write('\noutput >\n');
+        toolCallDelta.code_interpreter.outputs.forEach((output) => {
+          if (output.type === 'logs') {
+            process.stdout.write(`\n${output.logs}\n`);
+          }
+        });
+      }
+    }
+  });
+```
+
+----------------------------------------
+
+TITLE: Basic Text Interaction with ws (TypeScript)
+DESCRIPTION: Demonstrates how to establish a connection to the Realtime API using the `ws` library wrapper (`OpenAIRealtimeWS`), send session updates and user messages, and handle various events including text responses and connection closure.
+SOURCE: https://github.com/openai/openai-node/blob/master/realtime.md#_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+// requires `yarn add ws @types/ws`
+import { OpenAIRealtimeWS } from 'openai/beta/realtime/ws';
+
+const rt = new OpenAIRealtimeWS({ model: 'gpt-4o-realtime-preview-2024-12-17' });
+
+// access the underlying `ws.WebSocket` instance
+rt.socket.on('open', () => {
+  console.log('Connection opened!');
+  rt.send({
+    type: 'session.update',
+    session: {
+      modalities: ['text'],
+      model: 'gpt-4o-realtime-preview',
+    },
+  });
+
+  rt.send({
+    type: 'conversation.item.create',
+    item: {
+      type: 'message',
+      role: 'user',
+      content: [{ type: 'input_text', text: 'Say a couple paragraphs!' }],
+    },
+  });
+
+  rt.send({ type: 'response.create' });
+});
+
+rt.on('error', (err) => {
+  // in a real world scenario this should be logged somewhere as you
+  // likely want to continue processing events regardless of any errors
+  throw err;
+});
+
+rt.on('session.created', (event) => {
+  console.log('session created!', event.session);
+  console.log();
+});
+
+rt.on('response.text.delta', (event) => process.stdout.write(event.delta));
+rt.on('response.text.done', () => console.log());
+
+rt.on('response.done', () => rt.close());
+
+rt.socket.on('close', () => console.log('\nConnection closed!'));
+```
+
+----------------------------------------
+
+TITLE: Installing OpenAI Library with npx JSR
+DESCRIPTION: Adds the OpenAI library to a project using npx and the JSR registry. This is an alternative method for installing JSR packages.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_2
+
+LANGUAGE: sh
+CODE:
+```
+npx jsr add @openai/openai
+```
+
+----------------------------------------
+
+TITLE: Manually Paginating List Results in TypeScript
+DESCRIPTION: Shows how to manually paginate through list results using the `hasNextPage()` and `getNextPage()` methods provided by the SDK's pagination helper. This allows for more control over the pagination process.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_14
+
+LANGUAGE: TypeScript
+CODE:
+```
+let page = await client.fineTuning.jobs.list({ limit: 20 });
+for (const fineTuningJob of page.data) {
+  console.log(fineTuningJob);
+}
+
+// Convenience methods are provided for manually paginating:
+while (page.hasNextPage()) {
+  page = await page.getNextPage();
+  // ...
+}
+```
+
+----------------------------------------
+
+TITLE: Deleting Assistant (DELETE /assistants/{assistant_id}) in TypeScript
+DESCRIPTION: Deletes a specific assistant resource by its ID. This method executes a DELETE request to the /assistants/{assistant_id} endpoint.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_20
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.assistants.del(assistantId)
+```
+
+----------------------------------------
+
+TITLE: Installing OpenAI Library with Deno JSR
+DESCRIPTION: Adds the OpenAI library to a Deno project using the JSR registry. This command makes the library available for importing via the @openai/openai scope.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_1
+
+LANGUAGE: sh
+CODE:
+```
+deno add jsr:@openai/openai
+```
+
+----------------------------------------
+
+TITLE: Importing OpenAI Library from JSR
+DESCRIPTION: Demonstrates how to directly import the OpenAI library in Deno using a JSR specifier, without a separate installation step like deno add.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_3
+
+LANGUAGE: ts
+CODE:
+```
+import OpenAI from 'jsr:@openai/openai';
+```
+
+----------------------------------------
+
+TITLE: Using Web Standard Fetch Shim (TypeScript)
+DESCRIPTION: Demonstrates how to import the `openai/shims/web` module to instruct the library and TypeScript to use a global, web-standards-compliant `fetch` function instead of the default `node-fetch` in Node. This is useful when running Node with `--experimental-fetch` or in environments like NextJS.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_20
+
+LANGUAGE: typescript
+CODE:
+```
+// Tell TypeScript and the package to use the global web fetch instead of node-fetch.
+// Note, despite the name, this does not add any polyfills, but expects them to be provided if needed.
+import 'openai/shims/web';
+import OpenAI from 'openai';
+```
+
+----------------------------------------
+
+TITLE: Handling Realtime API Errors (TypeScript)
+DESCRIPTION: Highlights the importance of registering an `error` event listener on the Realtime API client to properly handle errors originating from either the client or the server, preventing unhandled promise rejections.
+SOURCE: https://github.com/openai/openai-node/blob/master/realtime.md#_snippet_2
+
+LANGUAGE: typescript
+CODE:
+```
+const rt = new OpenAIRealtimeWS({ model: 'gpt-4o-realtime-preview-2024-12-17' });
+rt.on('error', (err) => {
+  // in a real world scenario this should be logged somewhere as you
+  // likely want to continue processing events regardless of any errors
+  throw err;
+});
+```
+
+----------------------------------------
+
+TITLE: Accessing Raw HTTP Response Data (TypeScript)
+DESCRIPTION: Illustrates two methods for accessing the underlying HTTP `Response` object from API calls. The `.asResponse()` method returns only the raw response, while `.withResponse()` returns both the parsed data and the raw response object, allowing access to headers, status, etc.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_17
+
+LANGUAGE: typescript
+CODE:
+```
+const client = new OpenAI();
+
+const httpResponse = await client.responses
+  .create({ model: 'gpt-4o', input: 'say this is a test.' })
+  .asResponse();
+
+// access the underlying web standard Response object
+console.log(httpResponse.headers.get('X-My-Header'));
+console.log(httpResponse.statusText);
+
+const { data: modelResponse, response: raw } = await client.responses
+  .create({ model: 'gpt-4o', input: 'say this is a test.' })
+  .withResponse();
+console.log(raw.headers.get('X-My-Header'));
+console.log(modelResponse);
+```
+
+----------------------------------------
+
+TITLE: Accessing Request ID with .withResponse() in TypeScript
+DESCRIPTION: Shows an alternative method to access the request ID using the `.withResponse()` method, which is particularly useful when dealing with streaming responses. It destructures the response to get both the data and the `request_id`.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_12
+
+LANGUAGE: TypeScript
+CODE:
+```
+const { data: stream, request_id } = await openai.responses
+  .create({
+    model: 'gpt-4o',
+    input: 'Say this is a test',
+    stream: true,
+  })
+  .withResponse();
+```
+
+----------------------------------------
+
+TITLE: Aborting OpenAI Chat Stream on Function Call in TypeScript
+DESCRIPTION: Demonstrates how to use the `runner.abort()` method within a tool's function implementation to stop the chat completion stream when a specific function call is triggered. The example initializes the OpenAI client, runs chat completions with tools using `runTools`, defines a tool function that calls `runner.abort()`, logs messages, and awaits the final function call.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_14
+
+LANGUAGE: typescript
+CODE:
+```
+```ts
+import OpenAI from 'openai';
+
+const client = new OpenAI();
+
+async function main() {
+  const runner = client.chat.completions
+    .runTools({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: "How's the weather this week in Los Angeles?" }],
+      tools: [
+        {
+          type: 'function',
+          function: {
+            function: function updateDatabase(props, runner) {
+              runner.abort()
+            },
+            // …
+          }
+        },
+      ],
+    })
+    .on('message', (message) => console.log(message));
+
+  const finalFunctionCall = await runner.finalFunctionCall();
+  console.log('Final function call:', finalFunctionCall);
+}
+
+main();
+```
+```
+
+----------------------------------------
+
+TITLE: Subscribing to End of Stream Event in Assistant Streaming API - TypeScript
+DESCRIPTION: Demonstrates subscription to the 'end' event in the Assistant streaming API, signifying completion of the entire event stream. This serves as a signal to finalize any post-processing or cleanup after all content and events are delivered.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_10
+
+LANGUAGE: typescript
+CODE:
+```
+.on('end', () => ...)
+```
+
+----------------------------------------
+
+TITLE: Initializing and Using AzureOpenAI Client in TypeScript
+DESCRIPTION: This snippet demonstrates how to initialize the `AzureOpenAI` client for interacting with Azure OpenAI services. It uses `@azure/identity` to obtain an Azure AD token provider (`DefaultAzureCredential`, `getBearerTokenProvider`) which is then passed to the `AzureOpenAI` constructor along with the required API version. Finally, it shows how to make a basic chat completion request using the initialized client.
+SOURCE: https://github.com/openai/openai-node/blob/master/azure.md#_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+import { AzureOpenAI } from 'openai';
+import { getBearerTokenProvider, DefaultAzureCredential } from '@azure/identity';
+
+const credential = new DefaultAzureCredential();
+const scope = 'https://cognitiveservices.azure.com/.default';
+const azureADTokenProvider = getBearerTokenProvider(credential, scope);
+
+const openai = new AzureOpenAI({ azureADTokenProvider, apiVersion: "<The API version, e.g. 2024-10-01-preview>" });
+
+const result = await openai.chat.completions.create({
+  model: 'gpt-4o',
+  messages: [{ role: 'user', content: 'Say hello!' }],
+});
+
+console.log(result.choices[0]!.message?.content);
+```
+
+----------------------------------------
+
+TITLE: Accessing Request ID from Response in TypeScript
+DESCRIPTION: Illustrates how to access the `_request_id` property directly from the response object returned by an API call. This ID corresponds to the `x-request-id` header and is useful for debugging.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_11
+
+LANGUAGE: TypeScript
+CODE:
+```
+const response = await client.responses.create({ model: 'gpt-4o', input: 'testing 123' });
+console.log(response._request_id) // req_123
+```
+
+----------------------------------------
+
+TITLE: Setting up Real-time Azure OpenAI Connection in TypeScript
+DESCRIPTION: This snippet illustrates how to set up a real-time connection to Azure OpenAI using the `openai-node` SDK. It first configures an `AzureOpenAI` client with Azure AD credentials (`DefaultAzureCredential`, `getBearerTokenProvider`), the API version, and a specific deployment name. This configured client is then passed to `OpenAIRealtimeWS.azure()` to establish a real-time WebSocket instance (`rt`) for streaming interactions.
+SOURCE: https://github.com/openai/openai-node/blob/master/azure.md#_snippet_1
+
+LANGUAGE: typescript
+CODE:
+```
+const cred = new DefaultAzureCredential();
+const scope = 'https://cognitiveservices.azure.com/.default';
+const deploymentName = 'gpt-4o-realtime-preview-1001';
+const azureADTokenProvider = getBearerTokenProvider(cred, scope);
+const client = new AzureOpenAI({
+  azureADTokenProvider,
+  apiVersion: '2024-10-01-preview',
+  deployment: deploymentName,
+});
+const rt = await OpenAIRealtimeWS.azure(client);
+```
+
+----------------------------------------
+
+TITLE: Creating Transcription Session (POST /realtime/transcription_sessions) in TypeScript
+DESCRIPTION: Creates a new realtime transcription session. This method corresponds to a POST request to the /realtime/transcription_sessions endpoint, accepting configuration parameters.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_15
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.realtime.transcriptionSessions.create({ ...params })
+```
+
+----------------------------------------
+
+TITLE: Configuring HTTP/HTTPS Agent for Proxies/Connections (TypeScript)
+DESCRIPTION: Illustrates how to configure an `httpAgent` for the OpenAI client, useful for setting up proxies or customizing connection pooling behavior. Shows both default client configuration and per-request overrides. Requires `http` and potentially `https-proxy-agent`.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_22
+
+LANGUAGE: ts
+CODE:
+```
+import http from 'http';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+
+// Configure the default for all requests:
+const client = new OpenAI({
+  httpAgent: new HttpsProxyAgent(process.env.PROXY_URL),
+});
+
+// Override per-request:
+await client.models.list({
+  httpAgent: new http.Agent({ keepAlive: false }),
+});
+```
+
+----------------------------------------
+
+TITLE: Retrieve Run Step using OpenAI Node.js Client
+DESCRIPTION: Retrieves a specific run step by its thread ID, run ID, and step ID. This fetches the details of a particular step within a run. Returns a RunStep object.
+SOURCE: https://github.com/openai/openai-node/blob/master/api.md#_snippet_40
+
+LANGUAGE: TypeScript
+CODE:
+```
+client.beta.threads.runs.steps.retrieve(threadId, runId, stepId, { ...params })
+```
+
+----------------------------------------
+
+TITLE: Subscribing to RunStep Creation, Delta, and Completion Events in Assistant Streaming - TypeScript
+DESCRIPTION: Shows how to attach listeners for creation, delta, and completion of RunStep events in the assistant's streaming API. Enables application logic to react to all phases of a run step, which may correspond to tool executions or message productions in the workflow. Utilizes runStepCreated, runStepDelta, and runStepDone event types.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_5
+
+LANGUAGE: typescript
+CODE:
+```
+.on('runStepCreated', (runStep: RunStep) => ...)
+.on('runStepDelta', (delta: RunStepDelta, snapshot: RunStep) => ...)
+.on('runStepDone', (runStep: RunStep) => ...)
+```
+
+----------------------------------------
+
+TITLE: Accessing Context Methods on Assistant Streaming Objects - TypeScript
+DESCRIPTION: Lists available context and query methods that can be called on assistant streaming objects to retrieve the current state of a run, event, message, or run step. Also demonstrates how to collect final accumulated messages or run steps via promises after streaming concludes. These helpers assist with contextual event handling and post-stream collation.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_11
+
+LANGUAGE: typescript
+CODE:
+```
+.currentEvent(): AssistantStreamEvent | undefined
+
+.currentRun(): Run | undefined
+
+.currentMessageSnapshot(): Message
+
+.currentRunStepSnapshot(): Runs.RunStep
+```
+
+LANGUAGE: typescript
+CODE:
+```
+await .finalMessages() : Promise<Message[]>
+
+await .finalRunSteps(): Promise<RunStep[]>
+```
+
+----------------------------------------
+
+TITLE: Handling Image File Completion Events in Assistant Streaming API - TypeScript
+DESCRIPTION: Provides a handler for the imageFileDone event emitted by the Assistant streaming API, allowing developers to respond to image files once they are available. Since image files are not streamed incrementally, this event triggers only upon complete payload delivery. Relies on the provided content and message snapshot arguments.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_8
+
+LANGUAGE: typescript
+CODE:
+```
+.on('imageFileDone', (content: ImageFile, snapshot: Message) => ...)
+```
+
+----------------------------------------
+
+TITLE: Subscribing to Text Content Streaming Events in Assistant API - TypeScript
+DESCRIPTION: Exemplifies how to subscribe to specific streaming events related to text content (creation, delta, completion) in the assistant API. This event structure allows applications to assemble or process textual responses in a granular, incremental manner, supporting use cases such as live update UIs or logs.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_7
+
+LANGUAGE: typescript
+CODE:
+```
+.on('textCreated', (content: Text) => ...)
+.on('textDelta', (delta: TextDelta, snapshot: Text) => ...)
+.on('textDone', (content: Text, snapshot: Message) => ...)
+```
+
+----------------------------------------
+
+TITLE: Bulk Uploading Files to OpenAI Vector Store with Polling in TypeScript
+DESCRIPTION: Demonstrates using the `vectorStores.fileBatches.uploadAndPoll` helper function in the OpenAI Node.js SDK to upload multiple files to a specified vector store simultaneously. The example prepares a list of file streams (using `createReadStream`) and calls the helper function, which handles the upload and polls until the batch operation completes.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_17
+
+LANGUAGE: typescript
+CODE:
+```
+```ts
+const fileList = [
+  createReadStream('/home/data/example.pdf'),
+  ...
+];
+
+const batch = await openai.vectorStores.fileBatches.uploadAndPoll(vectorStore.id, {files: fileList});
+```
+```
+
+----------------------------------------
+
+TITLE: Running the Index Script with Bun (Bash)
+DESCRIPTION: This Bash command executes the main TypeScript file (index.ts) using Bun's script runner. It assumes that index.ts is present in the root directory and that all required dependencies are already installed. The command will start the primary process or test as defined in index.ts, and is usually invoked after setting up the environment with the previous installation command.
+SOURCE: https://github.com/openai/openai-node/blob/master/ecosystem-tests/bun/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+bun run index.ts
+```
+
+----------------------------------------
+
+TITLE: Installing Dependencies with Bun (Bash)
+DESCRIPTION: This Bash snippet installs all required dependencies for the project using Bun's package manager. It must be run from the project root directory where the dependency manifest (such as package.json or bun.lockb) is located. No additional arguments are necessary; the command will fetch and install packages as specified by the project's configuration files.
+SOURCE: https://github.com/openai/openai-node/blob/master/ecosystem-tests/bun/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+bun install
+```
+
+----------------------------------------
+
+TITLE: Subscribing to Message Creation, Delta, and Completion Events - TypeScript
+DESCRIPTION: Details the use of the messageCreated, messageDelta, and messageDone streaming event hooks in the Assistant streaming API. Listeners on these events allow applications to respond to different stages in the lifecycle of a Message object, such as its creation, incremental updates, and completion, delivering real-time content to consumers.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_6
+
+LANGUAGE: typescript
+CODE:
+```
+.on('messageCreated', (message: Message) => ...)
+.on('messageDelta', (delta: MessageDelta, snapshot: Message) => ...)
+.on('messageDone', (message: Message) => ...)
+```
+
+----------------------------------------
+
+TITLE: Starting Assistant Run and Tool Output Streams with OpenAI Node SDK - TypeScript
+DESCRIPTION: Provides example invocations of the streaming helper methods available in the OpenAI SDK for managing run, message, or tool output streaming in assistants. Shows three usage styles: streaming an existing run, creating a thread and starting a run with streaming, and submitting tool outputs with streaming enabled. Requires thread/run/message contexts to exist and OpenAI Node.js SDK installed.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_3
+
+LANGUAGE: typescript
+CODE:
+```
+openai.beta.threads.runs.stream();
+```
+
+LANGUAGE: typescript
+CODE:
+```
+openai.beta.threads.createAndRunStream();
+```
+
+LANGUAGE: typescript
+CODE:
+```
+openai.beta.threads.runs.submitToolOutputsStream();
+```
+
+----------------------------------------
+
+TITLE: Linting and Auto-Fixing Code with Yarn in Shell
+DESCRIPTION: This shell snippet provides commands for linting and auto-formatting/fixing code issues using Yarn. Project must have 'eslint' and 'prettier' configured. 'yarn lint' reports lint issues; 'yarn fix' attempts to automatically correct them. Applicable to the project's source code files.
+SOURCE: https://github.com/openai/openai-node/blob/master/CONTRIBUTING.md#_snippet_6
+
+LANGUAGE: sh
+CODE:
+```
+$ yarn lint
+```
+
+LANGUAGE: sh
+CODE:
+```
+$ yarn fix
+```
+
+----------------------------------------
+
+TITLE: Configuring Custom Fetch for Logging/Middleware (TypeScript)
+DESCRIPTION: Shows how to provide a custom `fetch` implementation when initializing the OpenAI client. This allows intercepting and modifying requests and responses, useful for logging or implementing middleware logic. Requires a fetch implementation like `undici`.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_21
+
+LANGUAGE: ts
+CODE:
+```
+import { fetch } from 'undici'; // as one example
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  fetch: async (url: RequestInfo, init?: RequestInit): Promise<Response> => {
+    console.log('About to make a request', url, init);
+    const response = await fetch(url, init);
+    console.log('Got response', response);
+    return response;
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: Generating Text with OpenAI Responses API (TypeScript)
+DESCRIPTION: Shows how to use the newer Responses API to generate text from an OpenAI model (gpt-4o). It initializes the client, sets instructions, provides input, and logs the output text. Requires the OPENAI_API_KEY environment variable.
+SOURCE: https://github.com/openai/openai-node/blob/master/README.md#_snippet_4
+
+LANGUAGE: ts
+CODE:
+```
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted
+});
+
+const response = await client.responses.create({
+  model: 'gpt-4o',
+  instructions: 'You are a coding assistant that talks like a pirate',
+  input: 'Are semicolons optional in JavaScript?',
+});
+
+console.log(response.output_text);
+```
+
+----------------------------------------
+
+TITLE: Subscribing to Raw Assistant Streaming Events in OpenAI SDK - TypeScript
+DESCRIPTION: Demonstrates subscribing to all raw assistant streaming events using the event handler interface in the OpenAI Node.js SDK. The on('event') pattern enables inspection and handling of low-level AssistantStreamEvent objects. Suits cases where fine-grained or custom processing is needed across all available event types.
+SOURCE: https://github.com/openai/openai-node/blob/master/helpers.md#_snippet_4
+
+LANGUAGE: typescript
+CODE:
+```
+.on('event', (event: AssistantStreamEvent) => ...)
+```

@@ -1,0 +1,32 @@
+Essential Libraries for Your Stack
+| Library/Framework | Context7 Library ID Example | Why Pull This? |
+|-------------------|-------------------------------------|---------------------------------------|
+| Next.js | /vercel/next.js | Your frontend framework |
+| React | /facebook/react | Used by Next.js and most UI code |
+| TypeScript | /microsoft/typescript | For type safety and TS features |
+| n8n | /n8n-io/n8n | For workflow automation |
+| PostgreSQL | /postgresql/docs | For database queries and features |
+| Prisma | /prisma/docs | If you use Prisma ORM |
+| Tailwind CSS | /tailwindlabs/tailwindcss | If you use Tailwind for styling |
+| Notion SDK/API | /notionhq/client | If you automate Notion |
+| Slack SDK/API | /slackapi/node-slack-sdk | If you automate Slack |
+| Stripe | /stripe/stripe-node | If you handle payments |
+| Zod | /context7/zod-v4 | For schema validation |
+| Axios | /axios/axios | For HTTP requests |
+| Node.js | /nodejs/node | For backend/server code |
+| Express | /expressjs/express | If you use Express in any API routes |
+
+get-library-docs { "context7CompatibleLibraryID": "/vercel/next.js" }
+get-library-docs { "context7CompatibleLibraryID": "/facebook/react" }
+get-library-docs { "context7CompatibleLibraryID": "/microsoft/typescript" }
+get-library-docs { "context7CompatibleLibraryID": "/n8n-io/n8n" }
+get-library-docs { "context7CompatibleLibraryID": "/postgresql/docs" }
+get-library-docs { "context7CompatibleLibraryID": "/prisma/docs" }
+get-library-docs { "context7CompatibleLibraryID": "/tailwindlabs/tailwindcss" }
+get-library-docs { "context7CompatibleLibraryID": "/notionhq/client" }
+get-library-docs { "context7CompatibleLibraryID": "/slackapi/node-slack-sdk" }
+get-library-docs { "context7CompatibleLibraryID": "/stripe/stripe-node" }
+get-library-docs { "context7CompatibleLibraryID": "/context7/zod-v4" }
+get-library-docs { "context7CompatibleLibraryID": "/axios/axios" }
+get-library-docs { "context7CompatibleLibraryID": "/nodejs/node" }
+get-library-docs { "context7CompatibleLibraryID": "/expressjs/express" }

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowLab AI Employees - Pitch Deck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: white;
+            margin-bottom: 2px;
+        }
+        
+        .slide:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            text-align: center;
+        }
+        
+        h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+        
+        .tagline {
+            font-size: 1.5em;
+            color: #666;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .comparison-card {
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            background: white;
+        }
+        
+        .comparison-card.standard {
+            border-top: 5px solid #e74c3c;
+        }
+        
+        .comparison-card.mcp {
+            border-top: 5px solid #27ae60;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .pricing-card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .pricing-card.featured {
+            border: 2px solid #3498db;
+        }
+        
+        .pricing-card.featured::before {
+            content: "MOST POPULAR";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3498db;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .price {
+            font-size: 3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+        }
+        
+        .price span {
+            font-size: 0.5em;
+            color: #666;
+        }
+        
+        .features {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .features li:last-child {
+            border-bottom: none;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(120deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-top: 30px;
+            transition: transform 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .roi-calculator {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+        
+        .roi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        
+        .roi-section {
+            text-align: center;
+        }
+        
+        .roi-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .roi-section.savings .roi-number {
+            color: #27ae60;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .metric-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+            display: block;
+            margin: 10px 0;
+        }
+        
+        .workflow-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        
+        .employee-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .employee-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        
+        .slide-number {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title -->
+    <div class="slide">
+        <div class="container">
+            <h1>FlowLab <span class="highlight">AI Employees</span></h1>
+            <p class="tagline">Build, Deploy, and Manage Intelligent AI Workers That Never Sleep</p>
+            <div style="text-align: center; margin-top: 50px;">
+                <p style="font-size: 1.2em; color: #666;">The Future of Business Automation</p>
+            </div>
+        </div>
+        <span class="slide-number">1</span>
+    </div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide">
+        <div class="container">
+            <h2>The Problem</h2>
+            <div class="comparison-grid">
+                <div class="metric-card">
+                    <h3>Current Reality</h3>
+                    <span class="metric-number">10+ hrs/week</span>
+                    <p>Spent on repetitive research & analysis</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Cost of Human VA</h3>
+                    <span class="metric-number">$2,000-4,000</span>
+                    <p>Monthly salary + benefits</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Workflow Limitations</h3>
+                    <span class="metric-number">73%</span>
+                    <p>Of automations break within 6 months</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Lost Opportunities</h3>
+                    <span class="metric-number">$50k+</span>
+                    <p>Annual cost of missed insights</p>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">2</span>
+    </div>
+
+    <!-- Slide 3: Standard vs AI Employee -->
+    <div class="slide">
+        <div class="container">
+            <h2>Standard Automation vs. AI Employees</h2>
+            <div class="comparison-grid">
+                <div class="comparison-card standard">
+                    <h3>❌ Standard HTTP Workflow</h3>
+                    <div class="code-block">
+Webhook → HTTP Request (Tavily) → 
+Parse JSON → HTTP Request (Notion) → 
+Parse JSON → HTTP Request (Slack) → 
+Error? → Entire workflow fails ❌
+                    </div>
+                    <ul style="margin-top: 20px; list-style: none;">
+                        <li>📍 Stateless - No memory</li>
+                        <li>📍 Linear - One path only</li>
+                        <li>📍 Brittle - Breaks easily</li>
+                        <li>📍 50+ nodes for complex tasks</li>
+                        <li>📍 2+ hours to build</li>
+                    </ul>
+                </div>
+                <div class="comparison-card mcp">
+                    <h3>✅ AI Employee (MCP)</h3>
+                    <div class="code-block">
+Webhook → AI Decision Layer → 
+MCP Wrapper (Orchestrates Everything) → 
+Adapts to findings → Self-healing → 
+Success ✅
+                    </div>
+                    <ul style="margin-top: 20px; list-style: none;">
+                        <li>🧠 Stateful - Remembers context</li>
+                        <li>🧠 Adaptive - Makes decisions</li>
+                        <li>🧠 Self-healing - Handles errors</li>
+                        <li>🧠 5 nodes for any complexity</li>
+                        <li>🧠 20 minutes to deploy</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">3</span>
+    </div>
+
+    <!-- Slide 4: How It Works -->
+    <div class="slide">
+        <div class="container">
+            <h2>Real Example: Competitive Intelligence</h2>
+            <div class="workflow-comparison">
+                <div>
+                    <h3>Standard Approach (20+ nodes)</h3>
+                    <div class="code-block">
+1. HTTP Request - Search competitor A
+2. Parse JSON
+3. HTTP Request - Search competitor B  
+4. Parse JSON
+5. HTTP Request - Search competitor C
+6. Parse JSON
+7. Code node - Compare prices
+8. Switch node - Determine actions
+9. HTTP Request - Update Notion
+10. HTTP Request - Send Slack
+... 10+ more nodes
+                    </div>
+                </div>
+                <div>
+                    <h3>AI Employee (3 nodes)</h3>
+                    <div class="code-block">
+1. Webhook Trigger
+2. MCP Wrapper:
+   {
+     "intent": "analyze competitors",
+     "actions": "auto"
+   }
+3. Intelligent Response
+                    </div>
+                    <div style="margin-top: 20px; padding: 20px; background: #e8f8f5; border-radius: 10px;">
+                        <strong>AI Automatically:</strong>
+                        <ul style="list-style: none; margin-top: 10px;">
+                            <li>✓ Searches all competitors</li>
+                            <li>✓ Compares with history</li>
+                            <li>✓ Analyzes trends</li>
+                            <li>✓ Generates insights</li>
+                            <li>✓ Takes appropriate action</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">4</span>
+    </div>
+
+    <!-- Slide 5: Pricing -->
+    <div class="slide">
+        <div class="container">
+            <h2>Simple, Scalable Pricing</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Starter</h3>
+                    <div class="price">$297<span>/month</span></div>
+                    <ul class="features">
+                        <li>1 AI Employee</li>
+                        <li>1,000 tasks/month</li>
+                        <li>Basic tools (Tavily, Slack)</li>
+                        <li>Community support</li>
+                        <li>Standard workflows</li>
+                    </ul>
+                    <a href="#" class="cta-button">Start Free Trial</a>
+                </div>
+                <div class="pricing-card featured">
+                    <h3>Growth</h3>
+                    <div class="price">$997<span>/month</span></div>
+                    <ul class="features">
+                        <li>3 AI Employees</li>
+                        <li>10,000 tasks/month</li>
+                        <li>All MCP tools</li>
+                        <li>Priority support</li>
+                        <li>Custom workflows</li>
+                    </ul>
+                    <a href="#" class="cta-button">Start Free Trial</a>
+                </div>
+                <div class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">$2,997<span>/month</span></div>
+                    <ul class="features">
+                        <li>Unlimited AI Employees</li>
+                        <li>Unlimited tasks</li>
+                        <li>Custom integrations</li>
+                        <li>White-label option</li>
+                        <li>Dedicated support</li>
+                    </ul>
+                    <a href="#" class="cta-button">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">5</span>
+    </div>
+
+    <!-- Slide 6: ROI Calculator -->
+    <div class="slide">
+        <div class="container">
+            <h2>The ROI is Immediate</h2>
+            <div class="roi-calculator">
+                <h3 style="text-align: center;">Typical Startup Founder</h3>
+                <div class="roi-grid">
+                    <div class="roi-section">
+                        <h4>Current Cost</h4>
+                        <p>10 hours/week × $50/hour</p>
+                        <div class="roi-number">$2,000/month</div>
+                        <p>Lost opportunity cost</p>
+                    </div>
+                    <div class="roi-section savings">
+                        <h4>With AI Employee</h4>
+                        <p>30 minutes/week + $297</p>
+                        <div class="roi-number">$1,678 Saved</div>
+                        <p>Per month</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 40px;">
+                    <div style="font-size: 3em; font-weight: bold; color: #27ae60;">564% ROI</div>
+                    <p style="font-size: 1.2em; margin-top: 10px;">In the first month</p>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">6</span>
+    </div>
+
+    <!-- Slide 7: AI Employee Examples -->
+    <div class="slide">
+        <div class="container">
+            <h2>Pre-Built AI Employees Ready to Hire</h2>
+            <div class="pricing-grid">
+                <div class="employee-card">
+                    <div class="employee-icon">🕵️</div>
+                    <h3>CompIntel Pro</h3>
+                    <p><strong>$497/month</strong></p>
+                    <ul style="list-style: none; margin: 20px 0;">
+                        <li>✓ Monitor competitors 24/7</li>
+                        <li>✓ Price change alerts</li>
+                        <li>✓ Feature tracking</li>
+                        <li>✓ Market analysis</li>
+                    </ul>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-icon">🎯</div>
+                    <h3>SalesHunter AI</h3>
+                    <p><strong>$597/month</strong></p>
+                    <ul style="list-style: none; margin: 20px 0;">
+                        <li>✓ Lead research</li>
+                        <li>✓ Contact enrichment</li>
+                        <li>✓ CRM automation</li>
+                        <li>✓ Outreach sequences</li>
+                    </ul>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-icon">✍️</div>
+                    <h3>ContentGenius</h3>
+                    <p><strong>$397/month</strong></p>
+                    <ul style="list-style: none; margin: 20px 0;">
+                        <li>✓ Topic research</li>
+                        <li>✓ SEO optimization</li>
+                        <li>✓ Content creation</li>
+                        <li>✓ Publishing automation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">7</span>
+    </div>
+
+    <!-- Slide 8: Revenue Projections -->
+    <div class="slide">
+        <div class="container">
+            <h2>Revenue Projections</h2>
+            <div style="text-align: center;">
+                <h3>Conservative Growth Model</h3>
+                <div class="roi-grid" style="margin-top: 40px;">
+                    <div class="metric-card">
+                        <h4>Month 1</h4>
+                        <span class="metric-number">$2,970</span>
+                        <p>10 customers</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Month 6</h4>
+                        <span class="metric-number">$49,700</span>
+                        <p>100 customers</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Month 12</h4>
+                        <span class="metric-number">$298,500</span>
+                        <p>500 customers</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>With Enterprise</h4>
+                        <span class="metric-number">$400k+</span>
+                        <p>Monthly recurring revenue</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">8</span>
+    </div>
+
+    <!-- Slide 9: Call to Action -->
+    <div class="slide">
+        <div class="container">
+            <h1>Ready to Build the Future?</h1>
+            <p class="tagline">Join the AI Employee Revolution</p>
+            
+            <div style="text-align: center; margin-top: 50px;">
+                <div class="metric-card" style="max-width: 600px; margin: 0 auto;">
+                    <h3>Next Steps</h3>
+                    <ul style="list-style: none; text-align: left; margin: 30px 0;">
+                        <li style="padding: 10px 0;">✅ Launch MVP in 30 days</li>
+                        <li style="padding: 10px 0;">✅ 10 beta customers ready</li>
+                        <li style="padding: 10px 0;">✅ $50k MRR in 6 months</li>
+                        <li style="padding: 10px 0;">✅ Scale to $1M ARR in 18 months</li>
+                    </ul>
+                </div>
+                
+                <a href="#" class="cta-button" style="font-size: 1.2em; padding: 20px 60px;">
+                    Let's Discuss Investment
+                </a>
+                
+                <p style="margin-top: 30px; color: #666;">
+                    Contact: team@flowlab.consulting | flowlab.consulting
+                </p>
+            </div>
+        </div>
+        <span class="slide-number">9</span>
+    </div>
+</body>
+</html>
