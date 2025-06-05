@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# MCP Memory Ruleset
+
+- Always log every significant edit, configuration change, or troubleshooting step as a new memory entity or observation.
+- When performing a task, recall and reference all relevant memory entities, logs, or context items related to that task.
+- Maintain a chronological and categorized memory log for easy querying and review.
+- For each new file, configuration, or rule added, create a memory entry describing its purpose and usage.
+- When recalling, prioritize the most recent and most relevant memory items for the current context.
+- Ensure memory is persistent, queryable, and accessible for both automated and manual review.
+

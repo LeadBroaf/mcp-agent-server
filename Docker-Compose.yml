@@ -29,8 +29,9 @@ services:
   n8n:
     image: n8nio/n8n
     ports:
-      - "5678:5678"
+      - "5679:5678"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
       - N8N_BASIC_AUTH_PASSWORD=admin
+      - N8N_URL=http://n8n:5678
